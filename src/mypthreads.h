@@ -95,7 +95,7 @@ pid_t __my_thread_gettid();
 
 my_thread_private_t *__my_thread_selfptr();
 
-int my_thread_detach_FIFO(my_thread_private_t *);
+int my_thread_detach_RoundRobin(my_thread_private_t *);
 
 int my_thread_detach_Lottery(my_thread_private_t *);
 

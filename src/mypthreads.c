@@ -198,7 +198,7 @@ void my_thread_end(void *return_val)
 	//my_thread_detach(self_ptr);
 	switch (scheduler){
 		case 0:
-			my_thread_detach_FIFO(self_ptr);
+			my_thread_detach_RoundRobin(self_ptr);
 			break;
 		case 1:
 			break;
@@ -360,7 +360,7 @@ int my_thread_detach_Lottery(my_thread_private_t * node)
 /*
   * Busca por el mejor hilo adecuado que este READY para ejecutarlo
   */
-int my_thread_detach_FIFO(my_thread_private_t * node)
+int my_thread_detach_RoundRobin(my_thread_private_t * node)
 {
 	my_thread_private_t *ptr = node->next;
 	//este blucle siempre se termina porque el hilo IDLE siempre esta READY
@@ -451,7 +451,7 @@ int my_thread_yield()
 
 	switch (scheduler){
 		case 0:
-			retval = my_thread_detach_FIFO(self);
+			retval = my_thread_detach_RoundRobin(self);
 			break;
 		case 1:
 			break;
