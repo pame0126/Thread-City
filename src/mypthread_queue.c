@@ -5,67 +5,67 @@
 #include "mypthreads.h"
 
 /* cabeza de la cola*/
-my_thread_private_t *my_thread_q_head;
+my_thread_private_t *my_thread_q_cabeza;
 
-void my_thread_q_init(my_thread_private_t * node)
+void my_thread_q_init(my_thread_private_t * nodo)
 {
-	node->prev = node;
-	node->next = node;
+	nodo->anterior = nodo;
+	nodo->siguiente = nodo;
 
-	my_thread_q_head = node;
+	my_thread_q_cabeza = nodo;
 }
 
-void my_thread_q_add(my_thread_private_t * node)
+void my_thread_q_add(my_thread_private_t * nodo)
 {
 
-	if (my_thread_q_head == NULL) {
-		my_thread_q_init(node);
+	if (my_thread_q_cabeza == NULL) {
+		my_thread_q_init(nodo);
 		return;
 	}
 	//se inserta al final de la cola
-	node->next = my_thread_q_head;
-	node->prev = my_thread_q_head->prev;
-	my_thread_q_head->prev->next = node;
-	my_thread_q_head->prev = node;
+	nodo->siguiente = my_thread_q_cabeza;
+	nodo->anterior = my_thread_q_cabeza->anterior;
+	my_thread_q_cabeza->anterior->siguiente = nodo;
+	my_thread_q_cabeza->anterior = nodo;
 
 	return;
 
 }
 
 /* elmina un nodo en especifico*/
-void my_thread_q_delete(my_thread_private_t * node)
+void my_thread_q_delete(my_thread_private_t * nodo)
 {
 
 	my_thread_private_t *p;
-	if (node == my_thread_q_head && node->next == my_thread_q_head) {
+	if (nodo == my_thread_q_cabeza && nodo->siguiente == my_thread_q_cabeza) {
 		printf("The Queue is now Empty!\n");
-		my_thread_q_head = NULL;
+		my_thread_q_cabeza = NULL;
 	}
 
-	if (node == my_thread_q_head)
-		my_thread_q_head = node->next;
+	if (nodo == my_thread_q_cabeza)
+		my_thread_q_cabeza = nodo->siguiente;
 
-	p = node->prev;
+	p = nodo->anterior;
 
-	p->next = node->next;
-	node->next->prev = p;
+	p->siguiente = nodo->siguiente;
+	nodo->siguiente->anterior = p;
 
 	return;
 
 }
 
-void my_thread_q_state_display()
+void my_thread_q_estado_display()
 {
 
-	if (my_thread_q_head != NULL) {
+	if (my_thread_q_cabeza != NULL) {
 
 		printf("\n The Queue contents are -> \n");
 		my_thread_private_t *p;
-		p = my_thread_q_head;
+		p = my_thread_q_cabeza;
 		do {
-			printf(" %d\n", p->state);
-			p = p->next;
-		} while (p != my_thread_q_head);
+			printf(" %d\n", p->estado);
+			p = p->siguiente;
+		} while (p != my_thread_q_cabeza);
 
 	}
 
@@ -75,14 +75,14 @@ my_thread_private_t *my_thread_q_search(unsigned long new_tid)
 {
 
 	my_thread_private_t *p;
-	if (my_thread_q_head != NULL) {
+	if (my_thread_q_cabeza != NULL) {
 
-		p = my_thread_q_head;
-		do {		//traverse to the last node in Q
+		p = my_thread_q_cabeza;
+		do {		//traverse to the last nodo in Q
 			if (p->tid == new_tid)
 				return p;
-			p = p->next;
-		} while (p != my_thread_q_head);
+			p = p->siguiente;
+		} while (p != my_thread_q_cabeza);
 
 	}
 	return NULL;

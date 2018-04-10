@@ -10,16 +10,16 @@
 #define FALSE 0
 #define TRUE 1
 
-#define RUNNING 0
-#define READY 	1 //espera para ser agendado (scheduling)
-#define BLOCKED 2 //esperando unirse
-#define DEFUNCT 3 //muerto
+#define CORRIENDO 0
+#define PREPARADO 1 //espera para ser agendado (scheduling)
+#define BLOQUEADO 2 //esperando unirse
+#define MUERTO 3 //muerto
 
-#define NTHREADS	8 //numero maximo de hilos
+#define NTHREADS 8 //numero maximo de hilos
 
 typedef struct my_thread_attr {
 	//valor por defecto: SIGSTKSZ
-	unsigned long stackSize;
+	unsigned long largoPila;
 }my_thread_attr_t;
 
 typedef struct my_thread {
@@ -32,21 +32,21 @@ typedef struct my_thread {
 typedef struct my_thread_private {
 
 	pid_t tid;
-	int state;
+	int estado;
 	//solo se usa en el algortimo de tiempo real, ubicacion del arreglo del algortimo
 	int id;
 	//solo se usa en el algoritmo de tiempo real, si es igual a -1, es porque no tiene prioridad
-	int priority;
+	int prioridad;
 	//funcion donde esta asignado el hilo
-	void * (*start_func) (void *);
+	void * (*funcion) (void *);
 	//argumentos de la funcion
-	void *args;
+	void *argumentos;
 	//valor de retorno de la funcion
-	void *returnValue;
-	struct my_thread_private *blockedForJoin;
+	void *valorRetorno;
+	struct my_thread_private *bloqueadoPorJoin;
 	//mutex utilizado por el despachador para programar este hilo
 	struct mutex sched_mutex;
-	struct my_thread_private *prev, *next;
+	struct my_thread_private *anterior, *siguiente;
 
 }my_thread_private_t;
 
@@ -58,11 +58,11 @@ my_thread_t my_thread_self(void);
 /*
  * Prepara el contexto de un nuevo hilo, attr se ignora por el momento
  */
-int my_thread_create(my_thread_t *new_thread_ID,
+int my_thread_create(my_thread_t *thread_ID,
 					my_thread_attr_t *attr,
-					void * (*start_func)(void *),
-					void *arg,
-					int priority_A);
+					void * (*funcion)(void *),
+					void *argumentos,
+					int prioridad_A);
 
 /*
  * cambia de un hilo ejecutandose a otro que este listo para ejecutarse (READY)
@@ -84,12 +84,12 @@ void my_thread_init();
  * en cola el hilo actual, luego dispatch y lo marca como ready para
  * volver a ser llamado
 */
-int my_thread_join(my_thread_t target_thread, void **status);
+int my_thread_join(my_thread_t target_thread, void **estado);
 
 /*
  * desencola un hilo y lo mata
  */
-void my_thread_end(void *retval);
+void my_thread_end(void *valorRetorno);
 
 pid_t __my_thread_gettid();
 

@@ -59,14 +59,14 @@ static int __my_thread_add_main_tcb()
 		return -ENOMEM;
 	}
 
-	main_tcb->start_func = NULL;
-	main_tcb->args = NULL;
-	main_tcb->state = READY;
+	main_tcb->funcion = NULL;
+	main_tcb->argumentos = NULL;
+	main_tcb->estado = PREPARADO;
 	main_tcb->id = number_thread++;
 	//printf("numero de hilos %i\n", number_thread);
-	main_tcb->priority = -1;
-	main_tcb->returnValue = NULL;
-	main_tcb->blockedForJoin = NULL;
+	main_tcb->prioridad = -1;
+	main_tcb->valorRetorno = NULL;
+	main_tcb->bloqueadoPorJoin = NULL;
 
 	main_tcb->tid = __my_thread_gettid();
 	//se inicializa el mutex en "0"
@@ -84,11 +84,11 @@ static int __my_thread_add_main_tcb()
  */
 int my_thread_create(my_thread_t * new_thread_ID,
 		    my_thread_attr_t * attr,
-		    void *(*start_func) (void *), void *arg, int priority_A)
+		    void *(*funcion) (void *), void *arg, int prioridad_A)
 {
 	//puntero de la pila usado por el proceso hijo (creado por clone)
 	char *child_stack;
-	unsigned long stackSize;
+	unsigned long largoPila;
 	my_thread_private_t *new_node;
 	pid_t tid;
 	int retval;
@@ -106,7 +106,7 @@ int my_thread_create(my_thread_t * new_thread_ID,
 		//se inicializa el mutex de manera global
 		my_mutex_init(&gfutex, 1);
 		//se crea el hilo idle
-		my_thread_create(&idle_u_tcb, NULL, my_thread_idle, NULL, priority_A);
+		my_thread_create(&idle_u_tcb, NULL, my_thread_idle, NULL, prioridad_A);
 	}
 
 	// tomado de http://foro.elhacker.net/programacion_cc-b49.0/
@@ -122,29 +122,29 @@ int my_thread_create(my_thread_t * new_thread_ID,
 
 	//si no se especifica el tamanio, entonces se usa el valor por defecto
 	if (attr == NULL){
-		stackSize = SIGSTKSZ;
+		largoPila = SIGSTKSZ;
 	}else{
-		stackSize = attr->stackSize;
+		largoPila = attr->largoPila;
 	}
 	//tomado de: http://foro.elhacker.net/programacion_cc-b49.0/
 	/* posix_memalign aligns the allocated memory at a 64-bit boundry. */
-	if (posix_memalign((void **)&child_stack, 8, stackSize)) {
+	if (posix_memalign((void **)&child_stack, 8, largoPila)) {
 		ERROR_PRINTF("posix_memalign failed! \n");
 		return -ENOMEM;
 	}
 
 	//se deja espacio para una invocacion en la base de la pila
-	child_stack = child_stack + stackSize - sizeof(sigset_t);
+	child_stack = child_stack + largoPila - sizeof(sigset_t);
 
 	//inicializacion del nuevo nodo
-	new_node->start_func = start_func;
-	new_node->args = arg;
-	new_node->state = READY;
+	new_node->funcion = funcion;
+	new_node->argumentos = arg;
+	new_node->estado = PREPARADO;
 	new_node->id = number_thread++;
 	//printf("numero de hilos %i\n", number_thread);
-	new_node->priority = priority_A;
-	new_node->returnValue = NULL;
-	new_node->blockedForJoin = NULL;
+	new_node->prioridad = prioridad_A;
+	new_node->valorRetorno = NULL;
+	new_node->bloqueadoPorJoin = NULL;
 	//mutex del tcb inicializado en 0
 	my_mutex_init(&new_node->sched_mutex, 0);
 
@@ -178,7 +178,7 @@ static void __my_thread_do_exit()
 
 /*
  * Ve si algun hilo esta bloqueado para unirse.
- * Si lo esta, entonces se marca como ready y se mata a los mismo hilos
+ * Si lo esta, entonces se marca como PREPARADO y se mata a los mismo hilos
  */
 void my_thread_end(void *return_val)
 {
@@ -188,12 +188,12 @@ void my_thread_end(void *return_val)
 	self_ptr = __my_thread_selfptr();
 
 	//estado muerto
-	self_ptr->state = DEFUNCT;
-	self_ptr->returnValue = return_val;
+	self_ptr->estado = MUERTO;
+	self_ptr->valorRetorno = return_val;
 
 	//cambia el estado de cualquier que espera
-	if (self_ptr->blockedForJoin != NULL)
-		self_ptr->blockedForJoin->state = READY;
+	if (self_ptr->bloqueadoPorJoin != NULL)
+		self_ptr->bloqueadoPorJoin->estado = PREPARADO;
 
 	//my_thread_detach(self_ptr);
 	switch (scheduler){
@@ -233,14 +233,14 @@ void *my_thread_idle(void *phony)
 		//puntero del TCB
 		traverse_tcb = __my_thread_selfptr();
 		idle_tcb_tid = traverse_tcb->tid;
-		traverse_tcb = traverse_tcb->next;
+		traverse_tcb = traverse_tcb->siguiente;
 
-		//si no hay un hilo con el estado DEFUNCT, entonces no mata al hilo
+		//si no hay un hilo con el estado MUERTO, entonces no mata al hilo
 		while (traverse_tcb->tid != idle_tcb_tid) {
-			if (traverse_tcb->state != DEFUNCT) {
+			if (traverse_tcb->estado != MUERTO) {
 				break;
 			}
-			traverse_tcb = traverse_tcb->next;
+			traverse_tcb = traverse_tcb->siguiente;
 		}
 
 		// si el idle es el unico hilo vivo, se mata el proceso
@@ -270,27 +270,27 @@ int my_thread_join(my_thread_t target_thread, void **status)
 	target = my_thread_q_search(target_thread.tid);
 
 	// si el hilo esta muerto, no necesita esperar, solo se retorna los datos
-	if (target->state == DEFUNCT) {
-		*status = target->returnValue;
+	if (target->estado == MUERTO) {
+		*status = target->valorRetorno;
 		return 0;
 	}
 
-	//DEBUG_PRINTF("Join: Checking for blocked for join\n");
+	//DEBUG_PRINTF("Join: Checking for BLOQUEADO for join\n");
 	//si el hilo no esta muerto y alguien mas esta esperando entonces da error
-	if (target->blockedForJoin != NULL){
+	if (target->bloqueadoPorJoin != NULL){
 		return -1;
 	}
 	//se establece la espera al hilo
-	target->blockedForJoin = self_ptr;
-	//DEBUG_PRINTF("Join: Setting state of %ld to %d\n",(unsigned long)self_ptr->tid, BLOCKED);
+	target->bloqueadoPorJoin = self_ptr;
+	//DEBUG_PRINTF("Join: Setting estado of %ld to %d\n",(unsigned long)self_ptr->tid, BLOQUEADO);
 	//y se pone como bloqueado para no volverlo a programar (scheduling)
-	self_ptr->state = BLOCKED;
+	self_ptr->estado = BLOQUEADO;
 
 	//programar otro hilo
 	my_thread_yield();
 
 	//cuando el hilo muere, se retorna los datos del hilo
-	*status = target->returnValue;
+	*status = target->valorRetorno;
 	return 0;
 }
 //////////////////////////////////////////////////////////////
@@ -326,27 +326,27 @@ my_thread_private_t *__my_thread_selfptr()
 //se hace varios detach, uno por cada scheduler
 
  /*
-  * Busca por el mejor hilo adecuado que este READY para ejecutarlo
+  * Busca por el mejor hilo adecuado que este PREPARADO para ejecutarlo
   */
 int my_thread_detach_Lottery(my_thread_private_t * node)
 {
-	my_thread_private_t *ptr = node->next;
-	//este blucle siempre se termina porque el hilo IDLE siempre esta READY
+	my_thread_private_t *ptr = node->siguiente;
+	//este blucle siempre se termina porque el hilo IDLE siempre esta PREPARADO
 	int b;
 	b = rand() % 11;
 	while (b > 0) {
-		ptr = ptr->next;
+		ptr = ptr->siguiente;
 		b--;
 	}
-	while (ptr->state != READY){
+	while (ptr->estado != PREPARADO){
 
-		ptr = ptr->next;
+		ptr = ptr->siguiente;
 	}
-	//si ningun otro esta en ready, entonces no se hace nada
+	//si ningun otro esta en PREPARADO, entonces no se hace nada
 	if (ptr == node){
 		return -1;
 	}else {
-		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->state);
+		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->estado);
 
 		//despierta el hilo "target_thread"
 		mutex_up(&ptr->sched_mutex);
@@ -358,22 +358,22 @@ int my_thread_detach_Lottery(my_thread_private_t * node)
 }
 
 /*
-  * Busca por el mejor hilo adecuado que este READY para ejecutarlo
+  * Busca por el mejor hilo adecuado que este PREPARADO para ejecutarlo
   */
 int my_thread_detach_RoundRobin(my_thread_private_t * node)
 {
-	my_thread_private_t *ptr = node->next;
-	//este blucle siempre se termina porque el hilo IDLE siempre esta READY
-	while (ptr->state != READY){
+	my_thread_private_t *ptr = node->siguiente;
+	//este blucle siempre se termina porque el hilo IDLE siempre esta PREPARADO
+	while (ptr->estado != PREPARADO){
 		//fifo
-		ptr = ptr->next;
+		ptr = ptr->siguiente;
 
 	}
-	//si ningun otro esta en ready, entonces no se hace nada
+	//si ningun otro esta en PREPARADO, entonces no se hace nada
 	if (ptr == node){
 		return -1;
 	}else {
-		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->state);
+		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->estado);
 
 		//despierta el hilo "target_thread"
 		mutex_up(&ptr->sched_mutex);
@@ -385,38 +385,38 @@ int my_thread_detach_RoundRobin(my_thread_private_t * node)
 }
 
 /*
-  * Busca por el mejor hilo adecuado que este READY para ejecutarlo
+  * Busca por el mejor hilo adecuado que este PREPARADO para ejecutarlo
   * algoritmo de tiempo real, por prioridad
   */
 int my_thread_detach_RT(my_thread_private_t * node)
 {
-	my_thread_private_t *ptr = node->next;
-	int priority_A = 0;
+	my_thread_private_t *ptr = node->siguiente;
+	int prioridad_A = 0;
 	my_thread_private_t *aux = NULL;
 	//printf("pid = %i\n", node->tid);
 	//printf("numero de hilos %i\n", number_thread);
 	while (ptr->tid != node->tid){
 		//printf("hola %i\n", ptr->tid);
 		if (threads_checked[ptr->id] == 0) {
-			if (ptr->priority >= priority_A) {
-				priority_A = ptr->priority;
+			if (ptr->prioridad >= prioridad_A) {
+				prioridad_A = ptr->prioridad;
 				aux = ptr;
 			}
 		}
-		ptr = ptr->next;
+		ptr = ptr->siguiente;
 
 	}
 	//printf("pid = %i\n", ptr->tid);
 	ptr = aux;
 	threads_checked[ptr->id] = 1;
 	//printf("pid = %i\n", ptr->tid);
-	//printf("priridad = %i\n", ptr->priority);
+	//printf("priridad = %i\n", ptr->prioridad);
 
-	//si ningun otro esta en ready, entonces no se hace nada
+	//si ningun otro esta en PREPARADO, entonces no se hace nada
 	if (ptr == node){
 		return -1;
 	}else {
-		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->state);
+		//DEBUG_PRINTF("Dispatcher: Wake-up:%ld Sleep:%ld %d %d\n",(unsigned long)ptr->tid, (unsigned long)node->tid,ptr->sched_mutex.count, ptr->estado);
 
 		//despierta el hilo "target_thread"
 		mutex_up(&ptr->sched_mutex);

@@ -19,7 +19,7 @@ int my_thread_wrapper(void *thread_tcb)
 	//DEBUG_PRINTF("Wrapper: futex value: %ld %d\n",(unsigned long)new_tcb->tid, new_tcb->sched_mutex.count);
 
 	//cuando se despierta, se llama la funcion definida por el usuario
-	new_tcb->start_func(new_tcb->args);
+	new_tcb->funcion(new_tcb->argumentos);
 
 	return 0;
 }
