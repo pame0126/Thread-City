@@ -1,7 +1,8 @@
 # Thread-City
 
 ### Contenidos de la versión actual
-* mythread:  biblioteca de hilos implementada con la bibliografia adjunta.
+* mythread:  Biblioteca de hilos implementada con la bibliografia adjunta.
+* ruta_moviles: Son los carros moviendos actualmente en diagonal, ubicada en la rama branche "carros". Deben moverse en cruz.
 
 ### Bibliografia
 
