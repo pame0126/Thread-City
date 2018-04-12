@@ -1,7 +1,7 @@
 # Thread-City
 
 ### Contenidos de la versión actual
-* <mythread> --> biblioteca de hilos implementada con la bibliografia adjunta.
+* "<mythread>":  biblioteca de hilos implementada con la bibliografia adjunta.
 
 ### Bibliografia
 
