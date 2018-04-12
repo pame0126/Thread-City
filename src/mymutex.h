@@ -6,7 +6,7 @@
 
 struct mutex
 {
-	int count;
+	int contador;
 };
 
 #include "mutex_inline.h"
@@ -23,11 +23,11 @@ extern int __mutex_up_slow(struct mutex *);
 
 static inline int my_mutex_destroy(struct mutex *futx, struct timespec *rel)
 {
-	int val, woken = 0;
+	int valor, despierto = 0;
 
-	while ((val = __mutex_down(&futx->count)) != 0) {
-		//retorna nuevo valor
-		switch (__mutex_down_slow(futx, val, rel)) {
+	while ((valor = __mutex_down(&futx->contador)) != 0) {
+		//retorna nuevo valoror
+		switch (__mutex_down_slow(futx, valor, rel)) {
 			case -1:
 				//fallo
 				return -1;
@@ -36,13 +36,13 @@ static inline int my_mutex_destroy(struct mutex *futx, struct timespec *rel)
 				return 0;
 			case 0:
 				//dormido
-				woken = 1;
+				despierto = 1;
 				break;
 		}
 	}
 	//si se despierta, es porque otro hilo esta mucho tiempo durmiendo
-	if (woken) {
-		futx->count = -1;
+	if (despierto) {
+		futx->contador = -1;
 	}
 	return 0;
 }
@@ -54,7 +54,7 @@ static inline int mutex_down(struct mutex *futx)
 
 static inline int mutex_trydown(struct mutex *futx)
 {
-	return (__mutex_down(&futx->count) == 0 ? 0: -1);
+	return (__mutex_down(&futx->contador) == 0 ? 0: -1);
 }
 
 /* Si __futex_up incrementa el contador de 0 a 1, entonces ese cambio no estaba esperado
@@ -62,17 +62,17 @@ static inline int mutex_trydown(struct mutex *futx)
  */
 static inline int mutex_up(struct mutex *futx)
 {
-	if (!__mutex_up(&futx->count))
+	if (!__mutex_up(&futx->contador))
 		return __mutex_up_slow(futx);
 	return 0;
 }
 
 static inline int mutex_up_fair(struct mutex *futx)
 {
-	if (!__mutex_up(&futx->count)) {
-		futx->count = MUTEX_PASSED;
+	if (!__mutex_up(&futx->contador)) {
+		futx->contador = MUTEX_PASSED;
 		my_mutex_lock();
-		if (sys_mutex(&futx->count, FUTEX_WAKE, 1, NULL) == 1){
+		if (sys_mutex(&futx->contador, FUTEX_WAKE, 1, NULL) == 1){
 			return 0;
 		}
 		return __mutex_up_slow(futx);
@@ -82,5 +82,5 @@ static inline int mutex_up_fair(struct mutex *futx)
 
 int mutex_await(struct mutex *futx, int signal);
 
-void my_mutex_init(struct mutex *sem, int val);
+void my_mutex_init(struct mutex *sem, int valor);
 #endif /* _FUTEX_H */

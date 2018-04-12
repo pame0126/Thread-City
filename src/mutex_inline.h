@@ -1,45 +1,45 @@
 #include "mutex_assam.h"
 
-static __inline__ int __mutex_down(int *counter)
+static __inline__ int __mutex_down(int *contador)
 {
-	int oval, val = *counter;
+	int oval, val = *contador;
 
 	if (val < 0){
 		return val;
 	}
-	
-	oval = compare_and_swap(counter, val-1, val);
-  
-	if (oval == val){ 
+
+	oval = compare_and_swap(contador, val-1, val);
+
+	if (oval == val){
 		return val-1;
 	}
-	
+
 	return -1;
 }
 
-static __inline__ int __mutex_up(int *counter)
+static __inline__ int __mutex_up(int *contador)
 {
-	int oval, val = *counter;
+	int oval, val = *contador;
 
-	oval = compare_and_swap(counter, val+1, val);
+	oval = compare_and_swap(contador, val+1, val);
 
 	return (oval == val && oval == 0);
 }
 
-static __inline__ int my_mutex_unlock(int *counter)
+static __inline__ int my_mutex_unlock(int *contador)
 {
-	int val = *counter;
+	int val = *contador;
 
-	int oval = compare_and_swap(counter, val+1, val);
-  
+	int oval = compare_and_swap(contador, val+1, val);
+
 	return oval;
 }
 
-static __inline__ int my_mutex_trylock(int *counter)
+static __inline__ int my_mutex_trylock(int *contador)
 {
-	int oval, val = *counter;
+	int oval, val = *contador;
 
-	oval = compare_and_swap(counter, val-1, val);
+	oval = compare_and_swap(contador, val-1, val);
 
 	return (oval == val) && (val+1 < 0);
 }
