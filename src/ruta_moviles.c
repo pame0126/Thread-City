@@ -98,7 +98,6 @@ void*arrancar_carro(void*arg){
 	int x0 = 0, y0 = 0;  //diagonales 1
 	int x1 = 0, y1 = 0;  //diagonales 2
 	pid_t id = __mythread_gettid();
-	id = (id%10)+1;
 	
 	//recorrer los arreglos de ruta
 	for(int a = 1;a < len ;a++){		
