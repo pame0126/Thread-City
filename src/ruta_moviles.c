@@ -5,15 +5,12 @@
 #include <time.h>
 
 #include <ruta_moviles.h>
-#include <mypthread.h>
+#include <mypthreads.h>
 
 #define ALTA 1
 #define BAJA 0
 
-int CANT_RUTAS_QUEMADAS = 0;
-
 int ID_PROGRES = 1;
-
 
 /* Inicia lista de autos
  * 
@@ -23,77 +20,6 @@ autos*inicia_lista_carros(){
 	elem->list_carros = (carro**)calloc(SIZE_AUTOS, sizeof(carro*));
 	elem->len = 0;
 	return elem;
-}
-
-int **ruta_q_A(){
-	int *rutaX = calloc(9, sizeof(int));
-	int *rutaY = calloc(9, sizeof(int));
-	rutaX[0] = 8; rutaY[0] = 8;
-	
-	rutaX[1] = 6; rutaY[1] = 5;
-	rutaX[2] = 6; rutaY[2] = 6;
-	rutaX[3] = 6; rutaY[3] = 7;
-	rutaX[4] = 6; rutaY[4] = 8;
-	rutaX[5] = 7; rutaY[5] = 8;
-	rutaX[6] = 8; rutaY[6] = 8;
-	rutaX[7] = 9; rutaY[7] = 8;
-	rutaX[8] = 10;rutaY[8] = 8;
-	int **res = (int**)calloc(2, sizeof(int*));
-	res[0] = rutaX; res[1] = rutaY;
-	return res;
-}
-
-int **ruta_q_B(){
-	int *rutaX = calloc(8, sizeof(int));
-	int *rutaY = calloc(8, sizeof(int));
-	rutaX[0] = 7; rutaY[0] = 7;
-	
-	rutaX[1] = 8; rutaY[1] = 11;
-	rutaX[2] = 7; rutaY[2] = 11;
-	rutaX[3] = 7; rutaY[3] = 10;
-	rutaX[4] = 7; rutaY[4] = 9;
-	rutaX[5] = 7; rutaY[5] = 8;
-	rutaX[6] = 7; rutaY[6] = 7;
-	rutaX[7] = 7; rutaY[7] = 6;
-	int **res = (int**)calloc(2, sizeof(int*));
-	res[0] = rutaX; res[1] = rutaY;
-	return res;
-}
-
-int **ruta_q_C(){
-	int *rutaX = calloc(8, sizeof(int));
-	int *rutaY = calloc(8, sizeof(int));
-	rutaX[0] = 7; rutaY[0] = 7;
-	
-	rutaX[1] = 9; rutaY[1] = 11;
-	rutaX[2] = 8; rutaY[2] = 11;
-	rutaX[3] = 7; rutaY[3] = 11;
-	rutaX[4] = 7; rutaY[4] = 10;
-	rutaX[5] = 7; rutaY[5] = 9;
-	rutaX[6] = 7; rutaY[6] = 8;
-	rutaX[7] = 7; rutaY[7] = 7;
-	int **res = (int**)calloc(2, sizeof(int*));
-	res[0] = rutaX; res[1] = rutaY;
-	return res;
-}
-
-int **rutas_quemadas(){
-	int **res = NULL;
-	switch(CANT_RUTAS_QUEMADAS){
-		case 0:
-			res = ruta_q_A();
-			break;
-		case 1:
-			res = ruta_q_B();
-			break;
-		case 2:
-			res = ruta_q_C();
-		default:
-			break;
-	}
-	printf("ruta %d\n",CANT_RUTAS_QUEMADAS);
-	CANT_RUTAS_QUEMADAS++;
-	return res;
 }
 
 /* Genera dos arreglos de largo 5 que contiene las rutas de cada automovil
@@ -164,14 +90,16 @@ void borrar_poss_anterior(int i ,int j){
  * */
 void*arrancar_carro(void*arg){
 	my_thread_yield();
-	int **tupla = rutas_quemadas();
+	int **tupla = genera_ruta_carro();
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
 	int len = tupla[0][0];
 	
 	int x0 = 0, y0 = 0;  //diagonales 1
 	int x1 = 0, y1 = 0;  //diagonales 2
-	pid_t id = __mythread_gettid();
+
+	pid_t id = __my_thread_gettid();
+	id = (id%10)+1;
 	
 	//recorrer los arreglos de ruta
 	for(int a = 1;a < len ;a++){		
@@ -183,7 +111,6 @@ void*arrancar_carro(void*arg){
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
 			
-			my_thread_yield();
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
 					printf("derecha %d > %d\n",j,tupla[1][a-1]);
@@ -193,9 +120,32 @@ void*arrancar_carro(void*arg){
 				//diagonal inferior a posicion actual
 				x1 = ( xi + 1 > 24)? 24 : xi+1;
 				y1 = ( xj + 1 < 0)? 0   : xj+1;
+				
+				//si estan libres los campos
+					printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
+				if( matriz_ciudad[x0][y0] == 0 &&
+				    matriz_ciudad[x1][y1] == 0 &&
+				    matriz_ciudad[i][j] == 0 ){
+						printf("no hay choque%d\n",id);
+					matriz_ciudad[i][j] = id;
+					//borrar el anterior
+					borrar_poss_anterior(xi,xj);
+				}
+				//te estan dando pase
+				else if(matriz_ciudad[x0][y0] < 0 || matriz_ciudad[x1][y1] < 0){
+					matriz_ciudad[i][j] = id;
+					//borrar el anterior
+					borrar_poss_anterior(tupla[0][a-1],tupla[1][a-1]);
+				}
+				else{
+						printf("\t\thay choque %d\n",id);
+					matriz_ciudad[xi][xj] = id*-1	;
+					a--;
+				}
 			}
+			
 			//DIR IZQUIERDA
-			else if(j < tupla[1][a-1]){
+			else{
 					printf("izquierda %d < %d\n",j,tupla[1][a-1]);
 				//diagonal superior a posicion actual
 				x0 = ( xi - 1 < 0 )? 0 : xi-1;
@@ -204,34 +154,7 @@ void*arrancar_carro(void*arg){
 				x1 = ( xi + 1 > 24)? 24 : xi + 1;
 				y1 = ( xj - 1 < 0)? 0   : xj - 1;
 					printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
-				
-			}
-			//DIR ARRIBA
-			else if(i < tupla[0][a-1]){
-					printf("arriba %d < %d\n",i,tupla[0][a-1]);
-				//diagonal superior izquierda
-				x0 = ( xi - 1 < 0 )? 0 : xi-1;
-				y0 = ( xj - 1 < 0)? 0 : xj-1;
-				//diagonal superior derecha
-				x1 = ( xi - 1 < 0)? 0 : xi-1;
-				y1 = ( xj + 1 > 24)? 24 : xj+1;
-					printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
-				
-			}
-			//DIR ABAJO
-			else if(i > tupla[0][a-1]){
-					printf("abajo %d < %d\n",i,tupla[0][a-1]);
-				//diagonal inferior izquierda
-				x0 = ( xi + 1 > 24 )? 24 : xi+1;
-				y0 = ( xj - 1 < 0)? 0 : xj-1;
-				//diagonal inferior derecha
-				x1 = ( xi + 1 > 24)? 24 : xi + 1;
-				y1 = ( xj + 1 > 24)? 24 : xj + 1;
-					printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
-				
-			}
-			//Evalua el movimiento
-			if( matriz_ciudad[x0][y0] == 0 &&
+				if( matriz_ciudad[x0][y0] == 0 &&
 				    matriz_ciudad[x1][y1] == 0 &&
 				    matriz_ciudad[i][j] == 0 ){
 						printf("no hay choque %d\n",id);
@@ -248,17 +171,18 @@ void*arrancar_carro(void*arg){
 				}
 				else{//se queda en el mismo lugar con negativo
 						printf("\t\thay choque %d\n",id);
-					matriz_ciudad[xi][xj] = id*-1;
+					matriz_ciudad[ xi ][ xj ] = id*-1	;
 					a--;
 				}
+			}
 		}
 		//si es primer elemento
 		else{
 			matriz_ciudad[i][j] = id;
 		}
-		print_matriz();
 		my_thread_yield();
-		sleep(1);//pausa para el movimiento
+		print_matriz();
+		//sleep(1);//pausa para el movimiento
 	}
 	matriz_ciudad[i][j] = 0;
 	//Elimina los espacios de memoria

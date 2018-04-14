@@ -1,7 +1,5 @@
-
-extern void mythread_q_init(mythread_private_t *node);
-extern void mythread_q_add(mythread_private_t *node);
-extern void mythread_q_delete(mythread_private_t *node);
-extern void mythread_q_state_display();
-extern mythread_private_t * mythread_q_search(unsigned long );
-
+extern void my_thread_q_init(my_thread_private_t *node);
+extern void my_thread_q_add(my_thread_private_t *node);
+extern void my_thread_q_delete(my_thread_private_t *node);
+extern void my_thread_q_state_display();
+extern my_thread_private_t * my_thread_q_search(unsigned long );

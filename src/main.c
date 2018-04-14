@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <mypthread.h>
+#include <mypthreads.h>
 
 #include <time.h>
 #include <ruta_moviles.h>
@@ -17,22 +17,6 @@
 
 
 
-/*
- * aumenta el contador en 50,
- * cuando tiene el control de regreso le suma otros 50 y sale
- */
-void *thread_func(void *arg)
-{
-	int *count = (int *)arg;
-
-	*count = *count + 50;
-	LOG_PRINTF("Thread %ld: Incremented count by 50 and will now yield\n", (unsigned long)mythread_self().tid);
-	my_thread_yield();
-	*count = *count + 50;
-	LOG_PRINTF("Thread %ld: Incremented count by 50 and will now exit\n", (unsigned long)mythread_self().tid);
-	my_thread_end(NULL);
-	return NULL;
-}
 
 void*prints(void*arg){
 	printf("INICIO\n");
@@ -50,20 +34,20 @@ int main(int argc, char *argv[])
 
 	printf("largo %d\n", lis->len);
 
-	mythread_t threads[NTHREADS];
-	//int count[NTHREADS];
+	my_thread_t threads[NTHREADS];
+	int count[NTHREADS];
 	int i;
 	char *status;
 	my_thread_init();
 		
-	for(int x = 0; x < 3;x++){
-		my_thread_create(&threads[x], NULL, arrancar_carro, &((lis->list_carros)[x]), NOT_RT);
+	for(int x = 0; x < 10;x++){
+		my_thread_create(&threads[x], NULL, arrancar_carro, &(count[x]), NOT_RT);
 	}
 
 	my_thread_chsched(0);
 	
-	for (i = 0; i < 3; i++) {
-		//arreglar el error 
+	for (i = 0; i < 4; i++) {
+		
 		my_thread_join(threads[i], (void **)&status);
 		
 	}
