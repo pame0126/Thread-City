@@ -29,7 +29,7 @@ libmythread.a: $(OBJS) $(INC)
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity
+	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity threadCity
 
 tags:
 	find . -name "*.[cChH]" | xargs ctags
