@@ -17,19 +17,19 @@
 
 #define NTHREADS 8 //numero maximo de hilos
 
-typedef struct my_thread_attr {
+typedef struct mythread_attr {
 	//valor por defecto: SIGSTKSZ
 	unsigned long largoPila;
-}my_thread_attr_t;
+}mythread_attr_t;
 
-typedef struct my_thread {
+typedef struct mythread {
 	pid_t tid;
-}my_thread_t;
+}mythread_t;
 
 /*
  * Thread Control Block (TCB)
  */
-typedef struct my_thread_private {
+typedef struct mythread_private {
 
 	pid_t tid;
 	int estado;
@@ -43,23 +43,23 @@ typedef struct my_thread_private {
 	void *argumentos;
 	//valor de retorno de la funcion
 	void *valorRetorno;
-	struct my_thread_private *bloqueadoPorJoin;
+	struct mythread_private *bloqueadoPorJoin;
 	//mutex utilizado por el despachador para programar este hilo
 	struct mutex sched_mutex;
-	struct my_thread_private *anterior, *siguiente;
+	struct mythread_private *anterior, *siguiente;
 
-}my_thread_private_t;
+}mythread_private_t;
 
 //puntero a la cabeza de la cola
-extern my_thread_private_t *my_thread_q_head;
+extern mythread_private_t *mythread_q_head;
 
-my_thread_t my_thread_self(void);
+mythread_t mythread_self(void);
 
 /*
  * Prepara el contexto de un nuevo hilo, attr se ignora por el momento
  */
-int my_thread_create(my_thread_t *thread_ID,
-					my_thread_attr_t *attr,
+int mythread_create(mythread_t *thread_ID,
+					mythread_attr_t *attr,
 					void * (*funcion)(void *),
 					void *argumentos,
 					int prioridad_A);
@@ -67,41 +67,41 @@ int my_thread_create(my_thread_t *thread_ID,
 /*
  * cambia de un hilo ejecutandose a otro que este listo para ejecutarse (READY)
  */
-int my_thread_yield(void);
+int mythread_yield(void);
 
 /*
  * cambia de algoritmo de scheduling
  */
-int my_thread_chsched(int sched);
+int mythread_chsched(int sched);
 
 /*
  * inicializa variables globales
  */
-void my_thread_init();
+void mythread_init();
 
 /*
  * suspende la llamada del hilo si el hilo actual no ha terminado,
  * en cola el hilo actual, luego dispatch y lo marca como ready para
  * volver a ser llamado
 */
-int my_thread_join(my_thread_t target_thread, void **estado);
+int mythread_join(mythread_t target_thread, void **estado);
 
 /*
  * desencola un hilo y lo mata
  */
-void my_thread_end(void *valorRetorno);
+void mythread_end(void *valorRetorno);
 
-pid_t __my_thread_gettid();
+pid_t __mythread_gettid();
 
-my_thread_private_t *__my_thread_selfptr();
+mythread_private_t *__mythread_selfptr();
 
-int my_thread_detach_RoundRobin(my_thread_private_t *);
+int mythread_detach_RoundRobin(mythread_private_t *);
 
-int my_thread_detach_Lottery(my_thread_private_t *);
+int mythread_detach_Lottery(mythread_private_t *);
 
-int my_thread_detach_RT(my_thread_private_t *);
+int mythread_detach_RT(mythread_private_t *);
 
-void __my_thread_debug_futex_init();
+void __mythread_debug_futex_init();
 
 /*
  * Solo se usa con el debuguer
@@ -110,7 +110,7 @@ extern char debug_msg[1000];
 extern struct mutex debug_futex;
 
 #ifdef DEBUG
-#define DEBUG_PRINTF(...) __my_thread_debug_futex_init(); \
+#define DEBUG_PRINTF(...) __mythread_debug_futex_init(); \
 			mutex_down(&debug_futex); \
 			sprintf(debug_msg, __VA_ARGS__); \
 			write(1, debug_msg, strlen(debug_msg)); \
@@ -119,13 +119,13 @@ extern struct mutex debug_futex;
 #define DEBUG_PRINTF(...) do {} while(0);
 #endif
 
-#define ERROR_PRINTF(...) __my_thread_debug_futex_init(); \
+#define ERROR_PRINTF(...) __mythread_debug_futex_init(); \
 			mutex_down(&debug_futex); \
 			sprintf(debug_msg, __VA_ARGS__); \
 			write(1, debug_msg, strlen(debug_msg)); \
 			mutex_up(&debug_futex);
 
-#define LOG_PRINTF(...) __my_thread_debug_futex_init(); \
+#define LOG_PRINTF(...) __mythread_debug_futex_init(); \
 			mutex_down(&debug_futex); \
 			sprintf(debug_msg, __VA_ARGS__); \
 			write(1, debug_msg, strlen(debug_msg)); \

@@ -13,7 +13,7 @@
 int ID_PROGRES = 1;
 
 /* Inicia lista de autos
- * 
+ *
  * */
 autos*inicia_lista_carros(){
 	autos*elem = calloc(1, sizeof(autos));
@@ -64,7 +64,7 @@ int**genera_ruta_carro(){
 /* imprime la martiz de la cuidad
  * */
 void *print_matriz(){
-	my_thread_yield();
+	mythread_yield();
 	printf("    0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n");
 	for(int i = 0; i < SIZE_MATRIZ;i++){
 		printf("%d [ ",i);
@@ -74,13 +74,13 @@ void *print_matriz(){
 		printf("]\n");
 	}
 	printf("----------------------------\n");
-	my_thread_yield();
+	mythread_yield();
 	return NULL;
 }
 
 void borrar_poss_anterior(int i ,int j){
 	matriz_ciudad[i][j] = 0;
-	my_thread_yield();
+	mythread_yield();
 }
 
 /* Se crea la ruta para el hilo actual.
@@ -89,28 +89,28 @@ void borrar_poss_anterior(int i ,int j){
  * y espera un turno o los que sean necesarios para no chocar.
  * */
 void*arrancar_carro(void*arg){
-	my_thread_yield();
+	mythread_yield();
 	int **tupla = genera_ruta_carro();
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
 	int len = tupla[0][0];
-	
+
 	int x0 = 0, y0 = 0;  //diagonales 1
 	int x1 = 0, y1 = 0;  //diagonales 2
 
-	pid_t id = __my_thread_gettid();
+	pid_t id = __mythread_gettid();
 	id = (id%10)+1;
-	
+
 	//recorrer los arreglos de ruta
-	for(int a = 1;a < len ;a++){		
+	for(int a = 1;a < len ;a++){
 		i = tupla[0][a];
 		j = tupla[1][a];
-		
+
 		if(a > 1){//si no es el primer movimiento
 			//posicion antes del cambio
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
-			
+
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
 					printf("derecha %d > %d\n",j,tupla[1][a-1]);
@@ -120,7 +120,7 @@ void*arrancar_carro(void*arg){
 				//diagonal inferior a posicion actual
 				x1 = ( xi + 1 > 24)? 24 : xi+1;
 				y1 = ( xj + 1 < 0)? 0   : xj+1;
-				
+
 				//si estan libres los campos
 					printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
 				if( matriz_ciudad[x0][y0] == 0 &&
@@ -143,7 +143,7 @@ void*arrancar_carro(void*arg){
 					a--;
 				}
 			}
-			
+
 			//DIR IZQUIERDA
 			else{
 					printf("izquierda %d < %d\n",j,tupla[1][a-1]);
@@ -180,7 +180,7 @@ void*arrancar_carro(void*arg){
 		else{
 			matriz_ciudad[i][j] = id;
 		}
-		my_thread_yield();
+		mythread_yield();
 		print_matriz();
 		//sleep(1);//pausa para el movimiento
 	}
@@ -189,7 +189,7 @@ void*arrancar_carro(void*arg){
 	free(tupla[0]);
 	free(tupla[1]);
 	free(tupla);
-	my_thread_yield();
-	my_thread_end(NULL);//el hilo muere
+	mythread_yield();
+	mythread_end(NULL);//el hilo muere
 	return NULL;
 }

@@ -20,8 +20,8 @@
 
 void*prints(void*arg){
 	printf("INICIO\n");
-	my_thread_yield();
-	my_thread_end(NULL);
+	mythread_yield();
+	mythread_end(NULL);
 	return NULL;
 }
 /*
@@ -34,24 +34,24 @@ int main(int argc, char *argv[])
 
 	printf("largo %d\n", lis->len);
 
-	my_thread_t threads[NTHREADS];
+	mythread_t threads[NTHREADS];
 	int count[NTHREADS];
 	int i;
 	char *status;
-	my_thread_init();
-		
+	mythread_init();
+
 	for(int x = 0; x < 10;x++){
-		my_thread_create(&threads[x], NULL, arrancar_carro, &(count[x]), NOT_RT);
+		mythread_create(&threads[x], NULL, arrancar_carro, &(count[x]), NOT_RT);
 	}
 
-	my_thread_chsched(0);
-	
+	mythread_chsched(0);
+
 	for (i = 0; i < 4; i++) {
-		
-		my_thread_join(threads[i], (void **)&status);
-		
+
+		mythread_join(threads[i], (void **)&status);
+
 	}
-	my_thread_end(NULL);
-	
+	mythread_end(NULL);
+
 	return 0;
 }
