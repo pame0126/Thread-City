@@ -6,12 +6,12 @@
  * Crear un hilo con esta funcion. Con el objetivo de suspender
  * el nuevo hilo hasta que sea programado (scheduler) por el despachador
  */
-int my_thread_wrapper(void *thread_tcb)
+int mythread_wrapper(void *thread_tcb)
 {
-	my_thread_private_t *new_tcb;
-	new_tcb = (my_thread_private_t *) thread_tcb;
+	mythread_private_t *new_tcb;
+	new_tcb = (mythread_private_t *) thread_tcb;
 
-	//DEBUG_PRINTF("Wrapper: will sleep on futex: %ld %d\n",(unsigned long)__my_thread_gettid(),new_tcb->sched_mutex.count);
+	//DEBUG_PRINTF("Wrapper: will sleep on futex: %ld %d\n",(unsigned long)__mythread_gettid(),new_tcb->sched_mutex.count);
 
 	//se suspende hasta que se despierte
 	mutex_down(&new_tcb->sched_mutex);
