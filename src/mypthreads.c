@@ -21,7 +21,7 @@
 int mythread_wrapper(void *);
 void *mythread_idle(void *);
 
-mythread_private_t *cabeza_thread_q;
+//mythread_private_t *mythread_q_cabeza;
 //puntero hacia el hilo principal
 mythread_private_t *tcb_principal;
 
@@ -97,7 +97,7 @@ int mythread_create(mythread_t * new_thread_ID,
 			   | CLONE_PARENT_SETTID
 			   | CLONE_CHILD_CLEARTID | CLONE_SYSVSEM);
 
-	if (cabeza_thread_q == NULL) {
+	if (mythread_q_cabeza == NULL) {
 		//primer hilo que se crea, por lo tanto se crea el hilo principal
 		valorRetorno = __mythread_add_tcb_principal();
 		if (valorRetorno != 0){

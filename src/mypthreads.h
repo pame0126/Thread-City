@@ -51,7 +51,7 @@ typedef struct mythread_private {
 }mythread_private_t;
 
 //puntero a la cabeza de la cola
-extern mythread_private_t *mythread_q_head;
+mythread_private_t *mythread_q_cabeza;
 
 mythread_t mythread_self(void);
 

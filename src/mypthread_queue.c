@@ -5,7 +5,7 @@
 #include "mypthreads.h"
 
 /* cabeza de la cola*/
-mythread_private_t *mythread_q_cabeza;
+//mythread_private_t *mythread_q_cabeza;
 
 void mythread_q_init(mythread_private_t * nodo)
 {
