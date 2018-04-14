@@ -56,14 +56,14 @@ int main(int argc, char *argv[])
 	char *status;
 	my_thread_init();
 		
-	for(int x = 0; x < 10;x++){
+	for(int x = 0; x < 3;x++){
 		my_thread_create(&threads[x], NULL, arrancar_carro, &((lis->list_carros)[x]), NOT_RT);
 	}
 
 	my_thread_chsched(0);
 	
-	for (i = 0; i < 4; i++) {
-		
+	for (i = 0; i < 3; i++) {
+		//arreglar el error 
 		my_thread_join(threads[i], (void **)&status);
 		
 	}
