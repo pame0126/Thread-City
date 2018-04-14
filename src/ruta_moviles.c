@@ -195,7 +195,7 @@ void*arrancar_carro(void*arg){
 				y1 = ( xj + 1 < 0)? 0   : xj+1;
 			}
 			//DIR IZQUIERDA
-			else{
+			else if(j < tupla[1][a-1]){
 					printf("izquierda %d < %d\n",j,tupla[1][a-1]);
 				//diagonal superior a posicion actual
 				x0 = ( xi - 1 < 0 )? 0 : xi-1;
@@ -206,6 +206,31 @@ void*arrancar_carro(void*arg){
 					printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
 				
 			}
+			//DIR ARRIBA
+			else if(i < tupla[0][a-1]){
+					printf("arriba %d < %d\n",i,tupla[0][a-1]);
+				//diagonal superior izquierda
+				x0 = ( xi - 1 < 0 )? 0 : xi-1;
+				y0 = ( xj - 1 < 0)? 0 : xj-1;
+				//diagonal superior derecha
+				x1 = ( xi - 1 < 0)? 0 : xi-1;
+				y1 = ( xj + 1 > 24)? 24 : xj+1;
+					printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
+				
+			}
+			//DIR ABAJO
+			else if(i > tupla[0][a-1]){
+					printf("abajo %d < %d\n",i,tupla[0][a-1]);
+				//diagonal inferior izquierda
+				x0 = ( xi + 1 > 24 )? 24 : xi+1;
+				y0 = ( xj - 1 < 0)? 0 : xj-1;
+				//diagonal inferior derecha
+				x1 = ( xi + 1 > 24)? 24 : xi + 1;
+				y1 = ( xj + 1 > 24)? 24 : xj + 1;
+					printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
+				
+			}
+			//Evalua el movimiento
 			if( matriz_ciudad[x0][y0] == 0 &&
 				    matriz_ciudad[x1][y1] == 0 &&
 				    matriz_ciudad[i][j] == 0 ){
@@ -223,7 +248,7 @@ void*arrancar_carro(void*arg){
 				}
 				else{//se queda en el mismo lugar con negativo
 						printf("\t\thay choque %d\n",id);
-					matriz_ciudad[ xi ][ xj ] = id*-1	;
+					matriz_ciudad[xi][xj] = id*-1;
 					a--;
 				}
 		}
