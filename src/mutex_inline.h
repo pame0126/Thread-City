@@ -1,47 +1,47 @@
 #include "mutex_assam.h"
 
-static __inline__ int __mutex_down(int *counter)
+static __inline__ int __mutex_down(int *contador)
 {
-	int oval, val = *counter;
+	int ovalor, valor = *contador;
 
-	if (val < 0){
-		return val;
+	if (valor < 0){
+		return valor;
 	}
-	
-	oval = compare_and_swap(counter, val-1, val);
-  
-	if (oval == val){ 
-		return val-1;
+
+	ovalor = compare_and_swap(contador, valor-1, valor);
+
+	if (ovalor == valor){
+		return valor-1;
 	}
-	
+
 	return -1;
 }
 
-static __inline__ int __mutex_up(int *counter)
+static __inline__ int __mutex_up(int *contador)
 {
-	int oval, val = *counter;
+	int ovalor, valor = *contador;
 
-	oval = compare_and_swap(counter, val+1, val);
+	ovalor = compare_and_swap(contador, valor+1, valor);
 
-	return (oval == val && oval == 0);
+	return (ovalor == valor && ovalor == 0);
 }
 
-static __inline__ int my_mutex_unlock(int *counter)
+static __inline__ int my_mutex_unlock(int *contador)
 {
-	int val = *counter;
+	int valor = *contador;
 
-	int oval = compare_and_swap(counter, val+1, val);
-  
-	return oval;
+	int ovalor = compare_and_swap(contador, valor+1, valor);
+
+	return ovalor;
 }
 
-static __inline__ int my_mutex_trylock(int *counter)
+static __inline__ int my_mutex_trylock(int *contador)
 {
-	int oval, val = *counter;
+	int ovalor, valor = *contador;
 
-	oval = compare_and_swap(counter, val-1, val);
+	ovalor = compare_and_swap(contador, valor-1, valor);
 
-	return (oval == val) && (val+1 < 0);
+	return (ovalor == valor) && (valor+1 < 0);
 }
 
 /* se bloquea y envia los escrito (datos) antes de activar
