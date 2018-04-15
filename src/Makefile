@@ -18,7 +18,7 @@ CC = gcc
 
 .PHONY: all lib clean tags test a5
 a5:  all
-all: lib test ejecutor
+all: lib test
 
 lib: $(LIB)
 
@@ -29,7 +29,7 @@ libmythread.a: $(OBJS) $(INC)
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity threadCity city
+	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity threadCity
 
 tags:
 	find . -name "*.[cChH]" | xargs ctags
@@ -37,7 +37,3 @@ tags:
 
 test:	$(TEST_OBJS) $(INC) lib
 	$(CC) -o threadCity $(CFLAGS) $(EXTRA_CFLAGS) $(TEST_OBJS) $(LIB)
-
-ejecutor:
-	gcc prueba.c -o city
-

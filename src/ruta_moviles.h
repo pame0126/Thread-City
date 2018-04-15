@@ -1,5 +1,3 @@
-
-
 #ifndef RUTA_MOVILES_H
 #define RUTA_MOVILES_H
 
@@ -44,6 +42,7 @@ void generar_lista_carros(autos*lista, int cant);
 void*arrancar_carro(void*arg);
 
 void*control_semaforos(void*arg);
+
 void*puente_un_carril(void*arg);
 
 #endif
