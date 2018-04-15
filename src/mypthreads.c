@@ -492,7 +492,7 @@ int mythread_chsched(int sched)
 			LOG_PRINTF("Changed Scheduler to Real Time\n");
 			break;
 		default:
-			ERROR_PRINTF("Incorrect option, possible options 0 - 3 \n");
+			ERROR_PRINTF("Incorrect option, possible options 0 - 2 \n");
 			exit(0);
 			return 1;
 
