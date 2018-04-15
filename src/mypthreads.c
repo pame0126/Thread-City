@@ -391,27 +391,17 @@ int mythread_detach_RoundRobin(mythread_private_t * nodo)
   */
 int mythread_detach_RT(mythread_private_t * nodo)
 {
-	mythread_private_t *puntero = nodo->siguiente;
-	int prioridad_A = 0;
-	mythread_private_t *auxiliar = NULL;
-	//printf("pid = %i\n", nodo->tid);
-	//printf("numero de hilos %i\n", numero_hilo);
-	while (puntero->tid != nodo->tid){
-		//printf("hola %i\n", ptr->tid);
-		if (hilos_inspeccionados[puntero->id] == 0) {
-			if (puntero->prioridad >= prioridad_A) {
-				prioridad_A = puntero->prioridad;
-				auxiliar = puntero;
-			}
+	mythread_private_t *puntero = nodo;
+	mythread_private_t *auxiliar = nodo;
+
+	do {
+		if (puntero->prioridad >= auxiliar->prioridad) {
+			auxiliar = puntero;
 		}
 		puntero = puntero->siguiente;
-
-	}
+	} while (puntero->tid != nodo->tid);
 	//printf("pid = %i\n", ptr->tid);
 	puntero = auxiliar;
-	hilos_inspeccionados[puntero->id] = 1;
-	//printf("pid = %i\n", ptr->tid);
-	//printf("priridad = %i\n", ptr->prioridad);
 
 	//si ningun otro esta en PREPARADO, entonces no se hace nada
 	if (puntero == nodo){
@@ -455,11 +445,9 @@ int mythread_yield()
 			valorRetorno = mythread_detach_RoundRobin(hilo);
 			break;
 		case 1:
-			break;
-		case 2:
 			valorRetorno = mythread_detach_Lottery(hilo);
 			break;
-		case 3:
+		case 2:
 			valorRetorno = mythread_detach_RT(hilo);
 			break;
 		default:
@@ -495,16 +483,12 @@ int mythread_chsched(int sched)
 	scheduler = sched;
 	switch (sched){
 		case 0:
-			LOG_PRINTF("Changed Scheduler to FIFO\n");
-			break;
-		case 1:
-			scheduler = 0;//se pone esta linea porque aun no hay algoritmo designado
 			LOG_PRINTF("Changed Scheduler to Round Robin\n");
 			break;
-		case 2:
+		case 1:
 			LOG_PRINTF("Changed Scheduler to Lottery\n");
 			break;
-		case 3:
+		case 2:
 			LOG_PRINTF("Changed Scheduler to Real Time\n");
 			break;
 		default:
