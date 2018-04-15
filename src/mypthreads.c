@@ -331,9 +331,10 @@ mythread_private_t *__mythread_selfptr()
 int mythread_detach_Lottery(mythread_private_t * nodo)
 {
 	mythread_private_t *puntero = nodo->siguiente;
+	// printf("largo cola de procesos: %d\n",  mythread_q_len(nodo));
 	//este blucle siempre se termina porque el hilo IDLE siempre esta PREPARADO
 	int b;
-	b = rand() % 11;
+	b = rand() % NTHREADS;
 	while (b > 0) {
 		puntero = puntero->siguiente;
 		b--;

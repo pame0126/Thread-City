@@ -88,3 +88,18 @@ mythread_private_t *mythread_q_search(unsigned long new_tid)
 	return NULL;
 
 }
+
+int mythread_q_len()
+{
+	int len = 0;
+	if (mythread_q_cabeza != NULL) {
+		mythread_private_t *p;
+		p = mythread_q_cabeza;
+		do {
+			++len;
+			p = p->siguiente;
+		} while (p != mythread_q_cabeza);
+
+	}
+	return len;
+}

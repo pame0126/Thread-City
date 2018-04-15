@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
 		mythread_create(&threads[x], NULL, arrancar_carro, &(count[x]), NOT_RT);
 	}
 
-	mythread_chsched(0);
+	mythread_chsched(2);
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 10; i++) {
 
 		mythread_join(threads[i], (void **)&status);
 
