@@ -10,7 +10,12 @@
 #define PRIORIDAD_ALTA 1
 int matriz_ciudad[SIZE_MATRIZ][SIZE_MATRIZ];
 
+#define PUENTE 1
+#define PUENTE_BLOQUEADO 2
 
+
+#define ROJO 3
+#define VERDE 0
 
 typedef struct carro{
 	pid_t id;
@@ -27,13 +32,10 @@ typedef struct automomiviles{
 	int len;
 }autos;
 
+
 autos*inicia_lista_carros();
 
 int**genera_ruta_carro();
-
-void insertar_carro_a_lista(autos*lista,carro* c);
-
-carro *crear_carro();
 
 void *print_matriz();
 
@@ -41,5 +43,7 @@ void generar_lista_carros(autos*lista, int cant);
 
 void*arrancar_carro(void*arg);
 
-void*carro_moverse(void*);
+void*control_semaforos(void*arg);
+void*puente_un_carril(void*arg);
+
 #endif
