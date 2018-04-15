@@ -334,7 +334,7 @@ int mythread_detach_Lottery(mythread_private_t * nodo)
 	// printf("largo cola de procesos: %d\n",  mythread_q_len(nodo));
 	//este blucle siempre se termina porque el hilo IDLE siempre esta PREPARADO
 	int b;
-	b = rand() % NTHREADS;
+	b = rand() % mythread_q_len();
 	while (b > 0) {
 		puntero = puntero->siguiente;
 		b--;
