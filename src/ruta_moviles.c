@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include <ruta_moviles.h>
-#include <mypthread.h>
+#include <mypthreads.h>
 
 int CANT_RUTAS_QUEMADAS = 0;
 
@@ -24,7 +24,7 @@ int **ruta_q_A(){
 	int *rutaX = calloc(9, sizeof(int));
 	int *rutaY = calloc(9, sizeof(int));
 	rutaX[0] = 9; rutaY[0] = 9;
-	
+
 	rutaX[1] = 6; rutaY[1] = 5;
 	rutaX[2] = 6; rutaY[2] = 6;
 	rutaX[3] = 6; rutaY[3] = 7;
@@ -42,7 +42,7 @@ int **ruta_q_B(){
 	int *rutaX = calloc(8, sizeof(int));
 	int *rutaY = calloc(8, sizeof(int));
 	rutaX[0] = 8; rutaY[0] = 8;
-	
+
 	rutaX[1] = 8; rutaY[1] = 11;
 	rutaX[2] = 7; rutaY[2] = 11;
 	rutaX[3] = 7; rutaY[3] = 10;
@@ -59,7 +59,7 @@ int **ruta_q_C(){
 	int *rutaX = calloc(8, sizeof(int));
 	int *rutaY = calloc(8, sizeof(int));
 	rutaX[0] = 8; rutaY[0] = 8;
-	
+
 	rutaX[1] = 9; rutaY[1] = 11;
 	rutaX[2] = 8; rutaY[2] = 11;
 	rutaX[3] = 7; rutaY[3] = 11;
@@ -76,7 +76,7 @@ int **ruta_q_D(){
 	int *rutaX = calloc(9, sizeof(int));
 	int *rutaY = calloc(9, sizeof(int));
 	rutaX[0] = 9; rutaY[0] = 9;
-	
+
 	rutaX[1] = 8;  rutaY[1] = 19;
 	rutaX[2] = 9;  rutaY[2] = 19;
 	rutaX[3] = 10; rutaY[3] = 19;
@@ -192,26 +192,26 @@ void borrar_poss_anterior(int i ,int j){
  * y espera un turno o los que sean necesarios para no chocar.
  * */
 void*arrancar_carro(void*arg){
-	my_thread_yield();
+	mythread_yield();
 	int **tupla = rutas_quemadas();
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
 	int len = tupla[0][0];
-	
+
 	int x0 = 0, y0 = 0;  //diagonales 1
 	int x1 = 0, y1 = 0;  //diagonales 2
 	pid_t id = __mythread_gettid();
 		//printf("%d largo %d",id, len);
 	//recorrer los arreglos de ruta
-	for(int a = 1; a < len ;a++){		
+	for(int a = 1; a < len ;a++){
 		i = tupla[0][a];
 		j = tupla[1][a];
 		if(a > 1){//si no es el primer movimiento
 			//posicion antes del cambio
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
-			
-			my_thread_yield();
+
+			mythread_yield();
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
 					//printf("derecha %d > %d\n",j,tupla[1][a-1]);
@@ -232,7 +232,7 @@ void*arrancar_carro(void*arg){
 				x1 = ( xi + 1 > 24)? 24 : xi + 1;
 				y1 = ( xj - 1 < 0)? 0   : xj - 1;
 					//printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
-				
+
 			}
 			//DIR ARRIBA
 			else if(i < tupla[0][a-1]){
@@ -286,12 +286,12 @@ void*arrancar_carro(void*arg){
 		else{
 			matriz_ciudad[i][j] = id;
 		}
-		my_thread_yield();
+		mythread_yield();
 	}
 	matriz_ciudad[i][j] = 0;
 	//Elimina los espacios de memoria
 	free_tupla_ruta(tupla);
-	my_thread_end(NULL);//el hilo muere
+	mythread_end(NULL);//el hilo muere
 	return NULL;
 }
 
@@ -309,7 +309,7 @@ int** ubicacion_semaforos(){
 	//posiciones X - Y
 	semaforos[0][1] = 7; semaforos[1][1] = 8;
 	semaforos[0][2] = 11; semaforos[1][2] = 8;
-	
+
 	return semaforos;
 }
 
@@ -318,7 +318,7 @@ int** ubicacion_semaforos(){
  * puentes.
  */
 void*control_semaforos(void*arg){
-	my_thread_yield();
+	mythread_yield();
 	//filas y columnas de posiciones de semaforos
 	int **semaforos = ubicacion_semaforos();
 	int len = semaforos[0][0];
@@ -338,28 +338,28 @@ void*control_semaforos(void*arg){
 			contador = 0;
 		}
 		contador++;
-		my_thread_yield();
+		mythread_yield();
 	}
-	
-	my_thread_end(NULL);//el hilo muere
+
+	mythread_end(NULL);//el hilo muere
 	return NULL;
 }
 
-/* 
+/*
  */
 void*puente_un_carril(void*arg){
-	my_thread_yield();
+	mythread_yield();
 	int *posX = calloc(3, sizeof(int));
 	posX[0] = 11; posX[1] = 12; posX[2] = 13;
 	int posY = 19;
-	
+
 	//semaforos del puente
 	int semaf1X = 10, semaf1Y = 19;
 	int semaf2X = 14, semaf2Y = 19;
 	int valor1, valor2;
 	int bandera = 1;//verde
 	int contador = 5;
-	
+
 	while(1){
 		//pone banderas de puente
 		for(int i = 0;i < 3;i++){
@@ -374,8 +374,8 @@ void*puente_un_carril(void*arg){
 			contador = 0;
 		}
 		contador++;
-		my_thread_yield();
+		mythread_yield();
 	}
-	my_thread_end(NULL);
+	mythread_end(NULL);
 	return NULL;
 }
