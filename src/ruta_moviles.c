@@ -24,7 +24,7 @@ int **ruta_q_A(){
 	int *rutaX = calloc(9, sizeof(int));
 	int *rutaY = calloc(9, sizeof(int));
 	rutaX[0] = 9; rutaY[0] = 9;
-
+	
 	rutaX[1] = 6; rutaY[1] = 5;
 	rutaX[2] = 6; rutaY[2] = 6;
 	rutaX[3] = 6; rutaY[3] = 7;
@@ -42,7 +42,7 @@ int **ruta_q_B(){
 	int *rutaX = calloc(8, sizeof(int));
 	int *rutaY = calloc(8, sizeof(int));
 	rutaX[0] = 8; rutaY[0] = 8;
-
+	
 	rutaX[1] = 8; rutaY[1] = 11;
 	rutaX[2] = 7; rutaY[2] = 11;
 	rutaX[3] = 7; rutaY[3] = 10;
@@ -59,7 +59,7 @@ int **ruta_q_C(){
 	int *rutaX = calloc(8, sizeof(int));
 	int *rutaY = calloc(8, sizeof(int));
 	rutaX[0] = 8; rutaY[0] = 8;
-
+	
 	rutaX[1] = 9; rutaY[1] = 11;
 	rutaX[2] = 8; rutaY[2] = 11;
 	rutaX[3] = 7; rutaY[3] = 11;
@@ -76,7 +76,7 @@ int **ruta_q_D(){
 	int *rutaX = calloc(9, sizeof(int));
 	int *rutaY = calloc(9, sizeof(int));
 	rutaX[0] = 9; rutaY[0] = 9;
-
+	
 	rutaX[1] = 8;  rutaY[1] = 19;
 	rutaX[2] = 9;  rutaY[2] = 19;
 	rutaX[3] = 10; rutaY[3] = 19;
@@ -157,14 +157,14 @@ int**genera_ruta_carro(){
 /* imprime la martiz de la cuidad
  * */
 void *print_matriz(){
-	printf("    0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n");
-	int x;
-	for(int i = 0; i < SIZE_MATRIZ;i++){
+	printf("    0 1 2 3 4 5 6\n");
+	//int x;
+	for(int i = 0; i < SIZE_X;i++){
 		printf("%d [ ",i);
-		for(int j = 0;j < SIZE_MATRIZ;j++){
+		for(int j = 0;j < SIZE_Y;j++){
 			if(matriz_ciudad[i][j] == ROJO){
-				x = matriz_ciudad[i][j];
-				printf("\e[31m%d\e[0m ", x);
+				//x = matriz_ciudad[i][j];
+				printf("\e[31m%c\e[0m ", 'R');
 			}
 			else{
 				printf("%d ", matriz_ciudad[i][j]);
@@ -197,30 +197,30 @@ void*arrancar_carro(void*arg){
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
 	int len = tupla[0][0];
-
+	
 	int x0 = 0, y0 = 0;  //diagonales 1
 	int x1 = 0, y1 = 0;  //diagonales 2
 	pid_t id = __mythread_gettid();
 		//printf("%d largo %d",id, len);
 	//recorrer los arreglos de ruta
-	for(int a = 1; a < len ;a++){
+	for(int a = 1; a < len ;a++){		
 		i = tupla[0][a];
 		j = tupla[1][a];
 		if(a > 1){//si no es el primer movimiento
 			//posicion antes del cambio
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
-
+			
 			mythread_yield();
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
 					//printf("derecha %d > %d\n",j,tupla[1][a-1]);
 				//diagonal superior a posicion actual
 				x0 = ( xi - 1 < 0 )? 0  : xi-1;
-				y0 = ( xj + 1 > 24)? 24 : xj+1;
+				y0 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj+1;
 				//diagonal inferior a posicion actual
-				x1 = ( xi + 1 > 24)? 24 : xi+1;
-				y1 = ( xj + 1 < 0)? 0   : xj+1;
+				x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi+1;
+				y1 = ( xj + 1 < 0)? 0 : xj+1;
 			}
 			//DIR IZQUIERDA
 			else if(j < tupla[1][a-1]){
@@ -229,31 +229,30 @@ void*arrancar_carro(void*arg){
 				x0 = ( xi - 1 < 0 )? 0 : xi-1;
 				y0 = ( xj - 1 < 0)? 0 : xj-1;
 				//diagonal inferior a posicion actual
-				x1 = ( xi + 1 > 24)? 24 : xi + 1;
+				x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi + 1;
 				y1 = ( xj - 1 < 0)? 0   : xj - 1;
 					//printf("diagonal arriba %d -- diagonal abajo %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
-
 			}
 			//DIR ARRIBA
 			else if(i < tupla[0][a-1]){
 					//printf("arriba %d < %d\n",i,tupla[0][a-1]);
 				//diagonal superior izquierda
-				x0 = ( xi - 1 < 0 )? 0 : xi-1;
+				x0 = ( xi - 1 < 0)? 0 : xi-1;
 				y0 = ( xj - 1 < 0)? 0 : xj-1;
 				//diagonal superior derecha
 				x1 = ( xi - 1 < 0)? 0 : xi-1;
-				y1 = ( xj + 1 > 24)? 24 : xj+1;
+				y1 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj+1;
 					//printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
 			}
 			//DIR ABAJO
 			else if(i > tupla[0][a-1]){
 					//printf("abajo %d < %d\n",i,tupla[0][a-1]);
 				//diagonal inferior izquierda
-				x0 = ( xi + 1 > 24 )? 24 : xi+1;
+				x0 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi+1;
 				y0 = ( xj - 1 < 0)? 0 : xj-1;
 				//diagonal inferior derecha
-				x1 = ( xi + 1 > 24)? 24 : xi + 1;
-				y1 = ( xj + 1 > 24)? 24 : xj + 1;
+				x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi + 1;
+				y1 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj + 1;
 					//printf("diagonal izq %d -- der %d\n",matriz_ciudad[x0][y0],matriz_ciudad[x1][y1]);
 			}
 				//Evalua el movimiento
@@ -266,6 +265,11 @@ void*arrancar_carro(void*arg){
 				}
 				//si esta en el puente
 				else if(matriz_ciudad[i][j] == PUENTE){
+					matriz_ciudad[i][j] = id;
+					borrar_poss_anterior(xi,xj);//borrar el anterior
+				}
+				//si esta en el puente
+				else if(matriz_ciudad[i][j] == PUENTE_BLOQUEADO){
 					matriz_ciudad[i][j] = id;
 					borrar_poss_anterior(xi,xj);//borrar el anterior
 				}
@@ -309,7 +313,7 @@ int** ubicacion_semaforos(){
 	//posiciones X - Y
 	semaforos[0][1] = 7; semaforos[1][1] = 8;
 	semaforos[0][2] = 11; semaforos[1][2] = 8;
-
+	
 	return semaforos;
 }
 
@@ -340,42 +344,59 @@ void*control_semaforos(void*arg){
 		contador++;
 		mythread_yield();
 	}
-
+	
 	mythread_end(NULL);//el hilo muere
 	return NULL;
 }
 
-/*
+/* 
  */
 void*puente_un_carril(void*arg){
 	mythread_yield();
 	int *posX = calloc(3, sizeof(int));
-	posX[0] = 11; posX[1] = 12; posX[2] = 13;
-	int posY = 19;
-
+	posX[0] = 4; posX[1] = 5; posX[2] = 6;
+	int posY = 1;
+	
 	//semaforos del puente
-	int semaf1X = 10, semaf1Y = 19;
-	int semaf2X = 14, semaf2Y = 19;
+	int semaf1X = 3, semaf1Y = 1;
+	int semaf2X = 7, semaf2Y = 1;
+	//valores del puente
 	int valor1, valor2;
 	int bandera = 1;//verde
 	int contador = 5;
-
+	
 	while(1){
-		//pone banderas de puente
-		for(int i = 0;i < 3;i++){
-			matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == 0)? PUENTE : matriz_ciudad[posX[i]][posY];
+		//si tiene un barco a la par por la derecha
+		if( matriz_ciudad[posX[0]][posY+1] == BARCO ||
+		    matriz_ciudad[posX[1]][posY+1] == BARCO ||
+		    matriz_ciudad[posX[2]][posY+1] == BARCO ){
+			//Bloque el puente
+			for (int i = 0; i < 3; i++) {
+				matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == 0)? BLOQUEADO : matriz_ciudad[posX[i]][posY];
+			}
+			//espera que no haya carros en el puente
 		}
-		if (contador == 5){
-			valor1 =  (bandera)? ROJO : VERDE;
-			valor2 = (bandera)? VERDE : ROJO;
-			bandera = (bandera)? 0 : 1;
-			matriz_ciudad[semaf1X][semaf1Y] = valor1;//semaforo arriba
-			matriz_ciudad[semaf2X][semaf2Y] = valor2;//semaforo abajo
-			contador = 0;
+		else{
+			//pone banderas de puente
+			for(int i = 0;i < 3;i++){
+				matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == 0)? PUENTE : matriz_ciudad[posX[i]][posY];
+			}
+			if (contador == 5){
+				valor1 =  (bandera)? ROJO : VERDE;
+				valor2 = (bandera)? VERDE : ROJO;
+				bandera = (bandera)? 0 : 1;
+				matriz_ciudad[semaf1X][semaf1Y] = valor1;//semaforo arriba
+				matriz_ciudad[semaf2X][semaf2Y] = valor2;//semaforo abajo
+				contador = 0;
+			}
+			contador++;
 		}
-		contador++;
 		mythread_yield();
 	}
 	mythread_end(NULL);
+	return NULL;
+}
+
+void*barco(void*arg){
 	return NULL;
 }

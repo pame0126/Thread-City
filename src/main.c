@@ -103,10 +103,11 @@ int main(int argc, char *argv[])
 	mythread_init();
 	//imprimir matriz
 	int x = 0;
+	/*
 	for(; x < 4;x++){
 		mythread_create(&threads[x], NULL, arrancar_carro, &((lis->list_carros)[x]), NOT_RT);
-	}
-	mythread_create(&threads[x], NULL, control_semaforos, &((lis->list_carros)[x]), 1);x++;
+	}*/
+	//mythread_create(&threads[x], NULL, control_semaforos, &((lis->list_carros)[x]), 1);x++;
 	mythread_create(&threads[x], NULL, puente_un_carril, &((lis->list_carros)[x]), 1);x++;
 	mythread_create(&threads[x], NULL, pausa, &((lis->list_carros)[x]), 1);
 

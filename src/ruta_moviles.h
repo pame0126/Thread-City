@@ -1,17 +1,21 @@
-
-
 #ifndef RUTA_MOVILES_H
 #define RUTA_MOVILES_H
 
 #define SIZE_AUTOS 30
-#define SIZE_MATRIZ 25
+
+#define SIZE_X 9
+#define SIZE_Y 7
+
+int matriz_ciudad[SIZE_X][SIZE_Y];
 
 #define PRIORIDAD_BAJA 0
 #define PRIORIDAD_ALTA 1
-int matriz_ciudad[SIZE_MATRIZ][SIZE_MATRIZ];
+
 
 #define PUENTE 1
 #define PUENTE_BLOQUEADO 2
+
+#define BARCO 5
 
 
 #define ROJO 3
@@ -44,6 +48,7 @@ void generar_lista_carros(autos*lista, int cant);
 void*arrancar_carro(void*arg);
 
 void*control_semaforos(void*arg);
+
 void*puente_un_carril(void*arg);
 
 #endif
