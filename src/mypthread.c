@@ -511,9 +511,6 @@ int my_thread_chsched(int sched)
 			ERROR_PRINTF("Incorrect option, possible options 0 - 3 \n");
 			exit(0);
 			return 1;
-		
 	}
-	
 	return 0;
-	
 }

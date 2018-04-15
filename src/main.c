@@ -40,6 +40,17 @@ void*prints(void*arg){
 	my_thread_end(NULL);
 	return NULL;
 }
+
+void*pausa(void*arg){
+	my_thread_yield();
+	while(1){
+	sleep(1);
+	print_matriz();
+	my_thread_yield();
+	}
+	
+	return NULL;
+}
 /*
  * ejemplo de uso de la biblioteca
  */
@@ -55,17 +66,20 @@ int main(int argc, char *argv[])
 	int i;
 	char *status;
 	my_thread_init();
-		
-	for(int x = 0; x < 3;x++){
+	//imprimir matriz
+	int x = 0;
+	for(; x < 4;x++){
 		my_thread_create(&threads[x], NULL, arrancar_carro, &((lis->list_carros)[x]), NOT_RT);
 	}
+	my_thread_create(&threads[x], NULL, control_semaforos, &((lis->list_carros)[x]), 1);x++;
+	my_thread_create(&threads[x], NULL, puente_un_carril, &((lis->list_carros)[x]), 1);x++;
+	my_thread_create(&threads[x], NULL, pausa, &((lis->list_carros)[x]), 1);
 
 	my_thread_chsched(0);
 	
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < x; i++) {
 		//arreglar el error 
 		my_thread_join(threads[i], (void **)&status);
-		
 	}
 	my_thread_end(NULL);
 	
