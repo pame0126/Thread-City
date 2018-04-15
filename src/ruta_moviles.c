@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include <ruta_moviles.h>
-#include <mypthreads.h>
+#include <mypthread.h>
 
 int CANT_RUTAS_QUEMADAS = 0;
 
@@ -192,7 +192,7 @@ void borrar_poss_anterior(int i ,int j){
  * y espera un turno o los que sean necesarios para no chocar.
  * */
 void*arrancar_carro(void*arg){
-	mythread_yield();
+	my_thread_yield();
 	int **tupla = rutas_quemadas();
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
@@ -211,7 +211,7 @@ void*arrancar_carro(void*arg){
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
 			
-			mythread_yield();
+			my_thread_yield();
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
 					//printf("derecha %d > %d\n",j,tupla[1][a-1]);
@@ -286,12 +286,12 @@ void*arrancar_carro(void*arg){
 		else{
 			matriz_ciudad[i][j] = id;
 		}
-		mythread_yield();
+		my_thread_yield();
 	}
 	matriz_ciudad[i][j] = 0;
 	//Elimina los espacios de memoria
 	free_tupla_ruta(tupla);
-	mythread_end(NULL);//el hilo muere
+	my_thread_end(NULL);//el hilo muere
 	return NULL;
 }
 
@@ -318,7 +318,7 @@ int** ubicacion_semaforos(){
  * puentes.
  */
 void*control_semaforos(void*arg){
-	mythread_yield();
+	my_thread_yield();
 	//filas y columnas de posiciones de semaforos
 	int **semaforos = ubicacion_semaforos();
 	int len = semaforos[0][0];
@@ -338,17 +338,17 @@ void*control_semaforos(void*arg){
 			contador = 0;
 		}
 		contador++;
-		mythread_yield();
+		my_thread_yield();
 	}
 	
-	mythread_end(NULL);//el hilo muere
+	my_thread_end(NULL);//el hilo muere
 	return NULL;
 }
 
 /* 
  */
 void*puente_un_carril(void*arg){
-	mythread_yield();
+	my_thread_yield();
 	int *posX = calloc(3, sizeof(int));
 	posX[0] = 11; posX[1] = 12; posX[2] = 13;
 	int posY = 19;
@@ -374,8 +374,8 @@ void*puente_un_carril(void*arg){
 			contador = 0;
 		}
 		contador++;
-		mythread_yield();
+		my_thread_yield();
 	}
-	mythread_end(NULL);
+	my_thread_end(NULL);
 	return NULL;
 }
