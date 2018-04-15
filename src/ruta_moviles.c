@@ -210,11 +210,7 @@ void*arrancar_carro(void*arg){
 			//posicion antes del cambio
 			xi = tupla[0][a-1];
 			xj = tupla[1][a-1];
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> b1e1d22f61d5508f6810b85a8dce9fd414e9769f
 			mythread_yield();
 			//mira a que lado va izq o der
 			if(j > tupla[1][a-1]){//Direccion DERECHA
@@ -344,11 +340,7 @@ void*control_semaforos(void*arg){
 		contador++;
 		mythread_yield();
 	}
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> b1e1d22f61d5508f6810b85a8dce9fd414e9769f
 	mythread_end(NULL);//el hilo muere
 	return NULL;
 }
