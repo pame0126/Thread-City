@@ -21,18 +21,21 @@ autos*inicia_lista_carros(){
 }
 
 int **ruta_q_A(){
-	int *rutaX = calloc(9, sizeof(int));
-	int *rutaY = calloc(9, sizeof(int));
-	rutaX[0] = 9; rutaY[0] = 9;
-	
-	rutaX[1] = 6; rutaY[1] = 5;
-	rutaX[2] = 6; rutaY[2] = 6;
-	rutaX[3] = 6; rutaY[3] = 7;
-	rutaX[4] = 6; rutaY[4] = 8;
-	rutaX[5] = 7; rutaY[5] = 8;
-	rutaX[6] = 8; rutaY[6] = 8;
-	rutaX[7] = 9; rutaY[7] = 8;
-	rutaX[8] = 10;rutaY[8] = 8;
+	int *rutaX = calloc(12, sizeof(int));
+	int *rutaY = calloc(12, sizeof(int));
+	rutaX[0] = 12; rutaY[0] = 12;
+	int x = 1, y = 1;
+	rutaX[1] = 1; rutaY[1] = 0;
+	int i = 2;
+	for(; i < 8;i++){
+		rutaX[i] = x; rutaY[i] = y;
+		x++;
+	}
+	//rutaX[i] = x; rutaY[i] = y;
+	for(;i < 12;i++){
+		rutaX[i] = x; rutaY[i] = y;
+		y++;
+	}
 	int **res = (int**)calloc(2, sizeof(int*));
 	res[0] = rutaX; res[1] = rutaY;
 	return res;
@@ -157,14 +160,30 @@ int**genera_ruta_carro(){
 /* imprime la martiz de la cuidad
  * */
 void *print_matriz(){
+	//para el rio "Default \e[44mBlue"
 	printf("    0 1 2 3 4 5 6\n");
-	//int x;
 	for(int i = 0; i < SIZE_X;i++){
 		printf("%d [ ",i);
 		for(int j = 0;j < SIZE_Y;j++){
 			if(matriz_ciudad[i][j] == ROJO){
-				//x = matriz_ciudad[i][j];
 				printf("\e[31m%c\e[0m ", 'R');
+			}
+			else if(matriz_ciudad[i][j] == PUENTE_BLOQUEADO){
+				printf("  ");
+			}
+			else if(matriz_ciudad[i][j] == PUENTE){
+				printf("\e[37m%s\e[0m ", "░");
+			}
+			else if(matriz_ciudad[i][j] == BARCO){
+				printf("\e[33m%c\e[0m ", 'B');
+			}
+			else if(( (i==4 || i==5 || i==6)&&
+					(j==0 || j ==2 || j==3 || j==6) )
+					&& matriz_ciudad[i][j] != BARCO){
+				printf("\e[94m%c\e[0m ", '~');
+			}
+			else if(matriz_ciudad[i][j] != 0){
+				printf("\e[36m%c\e[0m ", 'C');
 			}
 			else{
 				printf("%d ", matriz_ciudad[i][j]);
@@ -299,56 +318,6 @@ void*arrancar_carro(void*arg){
 	return NULL;
 }
 
-/* Se guardan las posiciones de los semaforos
- * Son posiciones fijas.
- * No maneja los semaforos de los puentes
- */
-int** ubicacion_semaforos(){
-	int **semaforos = (int**)calloc(2, sizeof(int*));
-	//dos semaforos
-	semaforos[0] = calloc(3, sizeof(int*));
-	semaforos[1] = calloc(3, sizeof(int*));
-	//largo de la lista
-	semaforos[0][0] = 3; semaforos[1][0] = 3;
-	//posiciones X - Y
-	semaforos[0][1] = 7; semaforos[1][1] = 8;
-	semaforos[0][2] = 11; semaforos[1][2] = 8;
-	
-	return semaforos;
-}
-
-/*
- * Va a manejar todos los semaforos menos el de los
- * puentes.
- */
-void*control_semaforos(void*arg){
-	mythread_yield();
-	//filas y columnas de posiciones de semaforos
-	int **semaforos = ubicacion_semaforos();
-	int len = semaforos[0][0];
-	int bandera = 1;//verde
-	int valor;
-	int i, x, y;
-	int contador = 5;
-	while (1){
-		if (contador == 5){
-			valor = (bandera)? ROJO : VERDE;
-			bandera = (bandera)? 0 : 1;
-			for ( i = 1 ; i < len ; i++ ){
-				x = semaforos[0][i];
-				y = semaforos[1][i];
-				matriz_ciudad[x][y] = valor;
-			}
-			contador = 0;
-		}
-		contador++;
-		mythread_yield();
-	}
-	
-	mythread_end(NULL);//el hilo muere
-	return NULL;
-}
-
 /* 
  */
 void*puente_un_carril(void*arg){
@@ -361,42 +330,52 @@ void*puente_un_carril(void*arg){
 	int semaf1X = 3, semaf1Y = 1;
 	int semaf2X = 7, semaf2Y = 1;
 	//valores del puente
-	int valor1, valor2;
+	int valor1 = VERDE, valor2 = VERDE;
 	int bandera = 1;//verde
 	int contador = 5;
+	//int bloqueado = 0;
 	
 	while(1){
-		//si tiene un barco a la par por la izquierda o esta en el puente
+		//si tiene un barco a la par por la izquierda o derecha
 		if( matriz_ciudad[posX[0]][posY-1] == BARCO ||
 		    matriz_ciudad[posX[1]][posY-1] == BARCO ||
-		    matriz_ciudad[posX[2]][posY-1] == BARCO 
-			){
+		    matriz_ciudad[posX[2]][posY-1] == BARCO ){
+				//espera que no haya carros en el puente
 			//Bloqueo el puente
 			for (int i = 0; i < 3; i++) {
 				matriz_ciudad[posX[i]][posY] = PUENTE_BLOQUEADO;
 			}
-			//espera que no haya carros en el puente
-		}/*
+			printf("puente bloqueado\n");
+			//bloqueado = 1;
+		}
+		//si esta pasando el puente
 		else if(matriz_ciudad[posX[0]][posY] == BARCO ||
 				matriz_ciudad[posX[1]][posY] == BARCO ||
-				matriz_ciudad[posX[2]][posY] == BARCO 
-				){
-				for(int i = 0;i < 3;i++){
-					matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == PUENTE)? PUENTE_BLOQUEADO : matriz_ciudad[posX[i]][posY];
-				}
-		}*/
+				matriz_ciudad[posX[2]][posY] == BARCO ){
+				printf("pasa el barco\n");
+				//se espera hasta que no haya barcos a la par del puente
+				mythread_yield();
+				NULL;
+		}
 		else{
+			printf("puente normal\n");
 			//pone banderas de puente
 			for(int i = 0;i < 3;i++){
-				matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == 0)? PUENTE : matriz_ciudad[posX[i]][posY];
+				matriz_ciudad[posX[i]][posY] = (matriz_ciudad[posX[i]][posY] == 0 ||
+												matriz_ciudad[posX[i]][posY] == PUENTE_BLOQUEADO)?
+												 PUENTE : matriz_ciudad[posX[i]][posY];
 			}
 			if (contador == 5){
 				valor1 =  (bandera)? ROJO : VERDE;
 				valor2 = (bandera)? VERDE : ROJO;
 				bandera = (bandera)? 0 : 1;
-				matriz_ciudad[semaf1X][semaf1Y] = valor1;//semaforo arriba
-				matriz_ciudad[semaf2X][semaf2Y] = valor2;//semaforo abajo
 				contador = 0;
+			}
+			if(matriz_ciudad[semaf1X][semaf1Y]==VERDE || matriz_ciudad[semaf1X][semaf1Y]==ROJO){
+				matriz_ciudad[semaf1X][semaf1Y] = valor1;//semaforo arriba
+			}
+			if(matriz_ciudad[semaf2X][semaf2Y]==VERDE || matriz_ciudad[semaf2X][semaf2Y]==ROJO){
+				matriz_ciudad[semaf2X][semaf2Y] = valor2;//semaforo abajo
 			}
 			contador++;
 		}
@@ -405,7 +384,8 @@ void*puente_un_carril(void*arg){
 	mythread_end(NULL);
 	return NULL;
 }
-
+/* Genera la ruta a los barcos
+ */
 int**ruta_barco(){
 	int**ruta = calloc(2, sizeof(int*));
 	int*rutaX = calloc(4, sizeof(int));
@@ -413,8 +393,8 @@ int**ruta_barco(){
 	//punto de inicio y final
 	int iniX = (rand()%3)+4;
 	int iniY = 0;
-	//int terX = iniX;
-	int terY = (rand()%2 == 0)? 2:3;
+	
+	int terY = (rand()%2 == 0)? 4:5;
 	//largo
 	rutaX[0] = terY; rutaY[0] = terY;
 	for (int i = 1;i < terY;i++){
@@ -433,6 +413,7 @@ void*barco(void*arg){
 	int len = ruta[0][0];
 	int i , j;
 	int antX, antY;
+	int px=-1, py=-1;
 	
 	for (int a = 1;a < len;a++){
 		i = ruta[0][a];
@@ -442,12 +423,18 @@ void*barco(void*arg){
 			if(matriz_ciudad[i][j] == 0){
 				matriz_ciudad[i][j] = BARCO;
 				borrar_poss_anterior(antX, antY);
+				if(px!=-1 && py!=-1){
+					matriz_ciudad[px][py] = PUENTE_BLOQUEADO;
+				}
 			}
 			else if(matriz_ciudad[i][j] == PUENTE_BLOQUEADO){
 				matriz_ciudad[i][j] = BARCO;
 				borrar_poss_anterior(antX,antY);
+				px = i; py=j;
 			}
+			
 			else if(matriz_ciudad[i][j] == PUENTE){
+				//matriz_ciudad[antX][antY] = BARCO;
 				a--;
 			}
 		}

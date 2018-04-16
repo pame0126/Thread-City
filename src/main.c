@@ -44,13 +44,12 @@ int main(int argc, char *argv[])
 	mythread_init();
 	//imprimir matriz
 	int x = 0;
-	/*
-	 * Usar cuando se tenga el generado de caminos
-	for(; x < 4;x++){
+	//cruza el puente, falta validar si se queda en medio del puente el carro
+	 // Usar cuando se tenga el generado de caminos
+	for(; x < 1;x++){
 		mythread_create(&threads[x], NULL, arrancar_carro, &((lis->list_carros)[x]), 1);
 	}
-	*/
-	//mythread_create(&threads[x], NULL, control_semaforos, &((lis->list_carros)[x]), 1);x++;
+	
 	mythread_create(&threads[x], NULL, puente_un_carril, &((lis->list_carros)[x]), 3);x++;
 	mythread_create(&threads[x], NULL, barco, &((lis->list_carros)[x]), 1);x++;
 	mythread_create(&threads[x], NULL, pausa, &((lis->list_carros)[x]), 5);
@@ -58,7 +57,6 @@ int main(int argc, char *argv[])
 	mythread_chsched(0);
 	
 	for (i = 0; i < x; i++) {
-		//arreglar el error 
 		mythread_join(threads[i], (void **)&status);
 	}
 	mythread_end(NULL);
