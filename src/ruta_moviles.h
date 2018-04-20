@@ -1,10 +1,12 @@
 #ifndef RUTA_MOVILES_H
 #define RUTA_MOVILES_H
 
-#define SIZE_AUTOS 30
+#define SIZE_AUTOS 10
+#define SIZE_BARCOS 3
+#define SIZE_AMBULANCIAS 4
 
-#define SIZE_X 9
-#define SIZE_Y 7
+#define SIZE_X 11
+#define SIZE_Y 10
 
 int matriz_ciudad[SIZE_X][SIZE_Y];
 
@@ -12,45 +14,27 @@ int matriz_ciudad[SIZE_X][SIZE_Y];
 #define PRIORIDAD_ALTA 1
 
 
-#define PUENTE 1
-#define PUENTE_BLOQUEADO 2
-
-#define BARCO 555
-
-
-#define ROJO 3
+#define PUENTE 11
+#define PUENTE_BLOQUEADO 22
+#define PUENTE_ESPERA 33
+#define BARCO 44
+#define ROJO 55
 #define VERDE 0
 
-typedef struct carro{
-	pid_t id;
-	int len_ruta;
-	int *arregloX;//ruta posiciones x
-	int *arregloY;//ruta posiciones y
-	int prioridad;
-	int i;
-	int j;
-}carro;
 
-typedef struct automomiviles{
-	struct carro **list_carros;
-	int len;
-}autos;
-
-
-autos*inicia_lista_carros();
+void*pausa(void*arg);
 
 int**genera_ruta_carro();
 
 void *print_matriz();
 
-void generar_lista_carros(autos*lista, int cant);
-
-void*arrancar_carro(void*arg);
+void*carro(void*arg);
 
 void*control_semaforos(void*arg);
 
 void*puente_un_carril(void*arg);
 
 void*barco(void*arg);
+
 
 #endif
