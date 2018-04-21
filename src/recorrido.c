@@ -1,29 +1,12 @@
-/**
- * file: dijkstra.c
- * author: yusuf shakeel
- * date: 2014-03-03
- *
- * description: find shortest path betweem two vertices
- *
- * vertices are represented using numbers.
- * vertex A becomes 0
- * vertex B becomes 1
- * and so on...
- */
+
 
 #include <stdio.h>
 #include <stdlib.h>
 
-/**
- * contant to represent infinity
- * it is assumed that no edge in the vertex will have weight equal
- * to this value.
- */
+
 #define INF 9999
 
-/**
- * total number of vertices in the graph
- */
+
 #define V 15
 
 /**
@@ -35,6 +18,40 @@ int Minimo(int x, int y) {
 	}
 	return y;
 }
+//retorna fila del elemento
+int returnFila(int valor){
+	int re = valor%10;
+	//printf("f %d  %d\n",re, valor);
+	return re;
+}
+//retorna filas del arreglo
+int* returnFilas(int* arreglo){
+	int tan = arreglo[0];
+	int j=0;
+	int* arreglox=(int*)calloc(tan, sizeof(int));
+	arreglox[0]=tan;
+	for(int i=1;i<=tan;i++){
+		arreglox[i]=returnFila(arreglo[i]);
+	}
+	return arreglox;
+}
+//retorna columna del valor
+int returnColumna(int valor){
+	int re= valor/10;
+	//printf("c %d  %d\n",re, valor);
+	return re;
+}
+//retorna columnas del arreglo
+int* returnColumnas(int* arreglo){
+	int tan = arreglo[0];
+	int j=0;
+	int* arregloy=(int*)calloc(tan, sizeof(int));
+	arregloy[0]=tan;
+	for(int i=1;i<=tan;i++){
+		arregloy[i]=returnColumna(arreglo[i]);
+	}
+	return arregloy;
+}	
 
 /**
  * revisa si esta marcado, el elemento de la lista
@@ -52,9 +69,9 @@ int EstaMarcado(int v, int VerticesMarcados[], int markedVerticesIdx) {
 }
 
 /**
- * this function will find shortest path between source and destination vertex
+ * encuentra el camino mas corto
  */
-void dijkstra(int graph[V][V], int ini, int dest) {
+int* dijkstra(int graph[V][V], int ini, int dest) {
 
 	//variables
 	int i, r, c,
@@ -72,7 +89,7 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 	 */
 	int verticesCaminoCorto[V] = {-1};
 	int CaminoCortoVerticeIdx = 0;
-
+	
 	/**
 	 * guarda el peso
 	 */
@@ -97,7 +114,7 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 	while(ActualVertex != dest) {
 
 		/**
-		 * copy marked values to the next row of weightTable
+		 * copia valores marcados al siguente linea de peso
 		 */
 		for (i = 0; i < VerticesMarcadosIdx; i++) {
 			c = VerticesMarcados[i];
@@ -105,8 +122,8 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 		}
 
 		/**
-		 * find the weight from the current vertex to all the other
-		 * vertices that are directly connected and not yet marked
+		 * encuentra peso del peso del vertice a los demas vertices
+		 * conectados y que no han sido marcados
 		 */
 		for (c = 0; c < V; c++) {
 
@@ -125,7 +142,7 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 		}
 
 		/**
-		 * find minimum unmarked vertices in current row
+		 * encuentra vertices mas pequeno no marcado 
 		 */
 		min = INF;
 		for (c = 0; c < V; c++) {
@@ -140,20 +157,20 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 		}
 
 		/**
-		 * found a new vertex for marking
+		 * nuevo vertice para marcar
 		 */
 		VerticesMarcados[VerticesMarcadosIdx++] = tmpC;
 		ActualVertex = tmpC;
-
+		
 		/**
-		 * variables update
+		 * variables actualizadas
 		 */
 		wtTablaR++;
 
 	}
 
 	/**
-	 * compute shortest path vertices
+	 * vertices del camino mas corto
 	 */
 	c = dest;
 	verticesCaminoCorto[CaminoCortoVerticeIdx++] = c;
@@ -169,17 +186,23 @@ void dijkstra(int graph[V][V], int ini, int dest) {
 	}
 
 	/**
-	 * display the weight and shortest path
+	 * imprime camino
 	 */
+	int* solucion=(int*)calloc(CaminoCortoVerticeIdx, sizeof(int));
 	printf("Camino mas corta %d and %d\n", ini, dest);
+	solucion[0]=CaminoCortoVerticeIdx;
+	int j=1;
 	for (i = CaminoCortoVerticeIdx-1; i >= 0; i--) {
 		printf("%d",verticesCaminoCorto[i]);
+		solucion[j]=verticesCaminoCorto[i];
 		if (i > 0) {
 			printf(" --> ");
 		}
+		j++;
 	}
 	printf("\n");
 	printf("Peso del camino: %d\n", TablaPesos[wtTablaR-1][dest]);
+	return solucion;
 
 }
 
@@ -187,7 +210,7 @@ int main(void) {
 
 	/**
 	 * arreglo de la matriz
-	 */
+	 */	
 	int graph[V][V] = {
 		{0,1,1,INF,1},
 		{1,0,1,1,INF},
@@ -204,15 +227,15 @@ int main(void) {
 		{INF,INF,INF,INF,0,INF,INF,INF,INF,INF, INF,1,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
 		{INF,INF,INF,INF,INF,0,INF,INF,INF,INF, INF,INF,1,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
 		{INF,INF,INF,INF,INF,INF,0,INF,INF,INF, INF,INF,INF,1,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
-
+		
 		{1,INF,INF,INF,INF,INF,INF,0,1,INF,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,  INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
-		{INF,1,INF,INF,INF,INF,INF,INF,0,1,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,  INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
+		{INF,1,INF,INF,INF,INF,INF,INF,0,1,     INF,INF,INF,INF,INF,1,INF,INF,INF,INF,  INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
 		{INF,INF,1,INF,INF,INF,INF,INF,INF,0,   1,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
-		{INF,INF,INF,1,INF,INF,INF,INF,INF,INF, 0,1,INF,INF,INF,INF,INF,INF,INF,INF,      INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,  INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
+		{INF,INF,INF,1,INF,INF,INF,INF,INF,INF, 0,1,INF,INF,INF,INF,INF,1,INF,INF,      INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,  INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
 		{INF,INF,INF,INF,1,INF,INF,INF,INF,INF, INF,0,1,INF,INF,INF,INF,INF,INF,INF,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
 		{INF,INF,INF,INF,INF,1,INF,INF,INF,INF, INF,INF,0,1,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
-		{INF,INF,INF,INF,INF,INF,1,INF,INF,INF, INF,INF,INF,0,1,INF,INF,INF,INF,INF,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,      INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
-
+		{INF,INF,INF,INF,INF,INF,1,INF,INF,INF, INF,INF,INF,0,1,INF,INF,INF,INF,1,   INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,      INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,     INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF,INF,INF,INF,INF,INF,INF,INF,    INF,INF,INF},
+		
 		{1,INF,1,1,0},
 		;*/
 int matriz[V][V]={
@@ -224,7 +247,7 @@ int matriz[V][V]={
 		{INF,INF,INF,INF,0,INF,INF,INF,INF,INF, INF,1,INF,INF,INF  },
 		{INF,INF,INF,INF,INF,0,INF,INF,INF,INF, INF,INF,1,INF,INF },
 		{INF,INF,INF,INF,INF,INF,0,INF,INF,INF, INF,INF,INF,1,INF },
-
+		
 		{1,INF,INF,INF,INF,INF,INF,0,1,INF,     INF,INF,INF,INF,INF},
 		{INF,1,INF,INF,INF,INF,INF,INF,0,1,     INF,INF,INF,INF,INF},
 		{INF,INF,1,INF,INF,INF,INF,INF,INF,0,   1,INF,INF,INF,INF},
@@ -232,17 +255,33 @@ int matriz[V][V]={
 		{INF,INF,INF,INF,1,INF,INF,INF,INF,INF, INF,0,1,INF,INF},
 		{INF,INF,INF,INF,INF,1,INF,INF,INF,INF, INF,INF,0,1,INF},
 		{INF,INF,INF,INF,INF,INF,1,INF,INF,INF, INF,INF,INF,0,1}};
-
+		
 	/**
-	 * inicio o destino
+	 * inicio y destino
 	 */
 	int src = 0;
 	int dest = 4;
 
 	/**
-	 * find shortest path
+	 * encuentra camino mas corto
 	 */
-	dijkstra(matriz, src, dest);
-
+	int* solucion = (int*)calloc(50, sizeof(int));
+	solucion=dijkstra(matriz, src, dest);
+	for(int i=0;i<=solucion[0];i++){
+	  printf(" %d ",solucion[i]);	
+	}
+	printf("\n");
+	int *x =(int*)calloc(solucion[0], sizeof(int));
+	x=returnColumnas(solucion);
+	for(int i=0;i<=solucion[0];i++){
+	  printf(" %d ",x[i]);	
+	}
+	printf("\n");
+	int *y =(int*)calloc(solucion[0], sizeof(int));
+	y=returnFilas(solucion);
+	for(int i=0;i<=solucion[0];i++){
+	  printf(" %d ",y[i]);	
+	}
+	printf("\n");
 	return 0;
 }
