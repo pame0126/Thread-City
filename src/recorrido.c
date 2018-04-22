@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include <recorrido.h>
 
 int destinos[15] ={15,15,15,17,18,31,33,15,15,38,91,93,95,97,98};
@@ -25,8 +25,9 @@ int returnFila(int valor){
 
 //retorna filas del arreglo
 int* returnFilas(int* arreglo){
-	int tan = arreglo[0];
-	int* arreglox=(int*)calloc(tan, sizeof(int));
+	 int tan = arreglo[0]+1;
+	 int* arreglox=(int*)calloc(tan+1, sizeof(int));
+	//memset( arreglox, 0, tan*sizeof(int) );
 	arreglox[0]=tan;
 	for(int i=1;i<=tan;i++){
 		arreglox[i]=arreglo[i] % 10;
@@ -43,9 +44,11 @@ int returnColumna(int valor){
 
 //retorna columnas del arreglo
 int* returnColumnas(int* arreglo){
-	int tan = arreglo[0];
+	int tan = arreglo[0]+1;
 	//int j=0;
-	int* arregloy=(int*)calloc(tan, sizeof(int));
+	int* arregloy=(int*)calloc(tan+1, sizeof(int));
+	//memset( arregloy, 0, tan*sizeof(int) );
+	//(int*)calloc(tan, sizeof(int));
 	arregloy[0]=tan;
 	for(int i=1;i<=tan;i++){
 		arregloy[i]= arreglo[i] /10;
@@ -157,7 +160,7 @@ int* dijkstra(int graph[V][V], int ini, int dest) {
 	}
 
 	//imprime camino
-	int* solucion=(int*)calloc(CaminoCortoVerticeIdx, sizeof(int));
+	int* solucion=(int*)calloc(CaminoCortoVerticeIdx+1, sizeof(int));
 	printf("Camino mas corta %d and %d\n", ini, dest);
 	solucion[0]=CaminoCortoVerticeIdx;
 	int j=1;
@@ -208,6 +211,7 @@ int **genera_ruta(){
 	int *x;
 	x=returnColumnas(solucion);
 	ruta[0] = x;
+	//free(x);
 	/*for(int i=0;i<=solucion[0];i++){
 		printf(" %d ",x[i]);	
 	}
@@ -217,10 +221,11 @@ int **genera_ruta(){
 	int *y;
 	y=returnFilas(solucion);
 	ruta[1] = y;
+	//free(y);
 	/*for(int i=0;i<=solucion[0];i++){
 	  printf(" %d ",y[i]);	
 	}
 	printf("\n");*/
-	free(solucion);
+	//free(solucion);
 	return ruta;
 }
