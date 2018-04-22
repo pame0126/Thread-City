@@ -5,11 +5,11 @@
 
 #include <ruta_moviles.h>
 #include <mypthreads.h>
+#include <recorrido.h>
 
 int CANT_RUTAS_QUEMADAS = 0;
 
 int ID_PROGRES = 1;
-
 
 
 /* Se llama para que haga una pausa de 1 segundo
@@ -46,6 +46,49 @@ int **ruta_q_A(){
 	return res;
 }
 
+/* Ruta quemada de posicion de matriz (3, 6) --> (9, 6)
+ */
+int **ruta_q_B(){
+	int *rutaX = calloc(12, sizeof(int));
+	int *rutaY = calloc(12, sizeof(int));
+	//largo 7
+	rutaX[0] = 8; rutaY[0] = 8;
+	int x = 3, y = 6;
+	rutaX[1] = x; rutaY[1] = y;
+	int i = 2;
+	printf("%d %d\n", rutaX[1], rutaY[1]);
+	for(; i < 8;i++){
+		x++;
+		rutaX[i] = x; rutaY[i] = y;
+		printf("%d %d\n", rutaX[i], rutaY[i]);
+	}
+	int **res = (int**)calloc(2, sizeof(int*));
+	res[0] = rutaX; res[1] = rutaY;
+	return res;
+}
+
+/* Ruta quemada de posicion de matriz (9, 7) --> (3, 7)
+ */
+int **ruta_q_C(){
+	int *rutaX = calloc(12, sizeof(int));
+	int *rutaY = calloc(12, sizeof(int));
+	//largo 7
+	rutaX[0] = 8; rutaY[0] = 8;
+	int x = 9, y = 7;
+	rutaX[1] = x; rutaY[1] = y;
+	int i = 2;
+	printf("%d %d\n", rutaX[1], rutaY[1]);
+	for(; i < 8;i++){
+		x--;
+		rutaX[i] = x; rutaY[i] = y;
+		printf("%d %d\n", rutaX[i], rutaY[i]);
+	}
+	int **res = (int**)calloc(2, sizeof(int*));
+	res[0] = rutaX; res[1] = rutaY;
+	return res;
+}
+
+
 /* rutas predefinidas quemadas para pruebas
  */
 int **rutas_quemadas(){
@@ -54,8 +97,14 @@ int **rutas_quemadas(){
 		case 0:
 			res = ruta_q_A();
 			break;
+		case 1:
+			res = ruta_q_B();
+			break;
+		case 2:
+			res = ruta_q_C();
+			break;
 		default:
-			res = ruta_q_A();
+			//res = ruta_q_A();
 			break;
 	}
 	CANT_RUTAS_QUEMADAS++;
@@ -119,6 +168,43 @@ void borrar_poss_anterior(int i ,int j){
 }
 
 
+int**genera_ruta_carro(){
+	//inicio y destino
+	int partidas[14] = {11,13, 17,18,31,33,35,37,38,91,93,95,97,98};
+	int llegadas[15] = {11,13, 17,18,31,33,35,15,37,38,91,93,95,97,98};
+	int src = rand() % 14;
+	int dest = rand() % 15;
+	int**ruta = calloc(2, sizeof(int*));
+	
+	src = partidas[src];
+	dest = llegadas[dest];
+	
+	printf("salida %d llegada %d\n", src, dest);
+	
+	int *solucion = dijkstra(matriz_nodos, src, dest);
+	
+	
+	for(int i=0;i<=solucion[0];i++){
+	  printf(" %d ",solucion[i]);	
+	}
+	printf("\n");
+	
+	//columnas
+	ruta[0]=returnColumnas(solucion);
+	for(int i=0;i<=solucion[0];i++){
+		printf(" %d ",ruta[0][i]);	
+	}
+	printf("\n");
+	
+	//filas
+	ruta[1]=returnFilas(solucion);
+	for(int i=0;i<=solucion[0];i++){
+	  printf(" %d ",ruta[1][i]);	
+	}
+	printf("\n");
+	return ruta;
+}
+
 /* Se crea la ruta para el hilo actual.
  * Esta funcion recorre la ruta recibida con validaciones de choques de carros.
  * Si un carro va a chocar con otro se pone en condicion de dar pase (numero negativo)
@@ -126,7 +212,7 @@ void borrar_poss_anterior(int i ,int j){
  * */
 void*carro(void*arg){
 	mythread_yield();
-	int **tupla = rutas_quemadas();
+	int **tupla = genera_ruta();//rutas_quemadas();
 	int i = 0, j = 0;    //posicion a la que se movera
 	int xi = 0, xj = 0;  //posicion actual
 	int len = tupla[0][0];
@@ -135,7 +221,7 @@ void*carro(void*arg){
 	int x1 = 0, y1 = 0;  //diagonales 2
 	pid_t id = __mythread_gettid();
 	//recorrer los arreglos de ruta
-	for(int a = 1; a < len ;a++){		
+	for(int a = 1; a <= len ;a++){		
 		i = tupla[0][a];
 		j = tupla[1][a];
 		if(a > 1){//si no es el primer movimiento
@@ -180,9 +266,16 @@ void*carro(void*arg){
 				x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi + 1;
 				y1 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj + 1;
 			}
+			
 				//Evalua el movimiento si no hay choques
 				if( matriz_ciudad[x0][y0] == 0 && 
 						matriz_ciudad[x1][y1] == 0 && 
+						matriz_ciudad[i][j] == 0 ){
+					matriz_ciudad[i][j] = id;
+					borrar_poss_anterior(xi,xj);//borrar el anterior
+				}
+				//si esta en el puente de dos carriles
+				else if( ( ( i == 5 || i == 6 || i == 7 ) && ( j == 6 || j==7 ) ) &&
 						matriz_ciudad[i][j] == 0 ){
 					matriz_ciudad[i][j] = id;
 					borrar_poss_anterior(xi,xj);//borrar el anterior
@@ -420,5 +513,44 @@ void*barco(void*arg){
 		mythread_yield();
 	}
 	mythread_end(NULL);
+	return NULL;
+}
+
+/* Solo existira una planta nuclear en la ciudad.
+ */
+void*planta_nuclear(void*arg){
+	mythread_yield();
+	int cant_autos = 0;
+	int min = 7;
+	int time = 0;
+	int i = 1, j = 5;//posicion de la planta nuclear
+	int bandera = 1;
+	matriz_ciudad[i][j] = PLANTA_NUCLEAR;
+	//minetras no explote
+	while(bandera){
+		
+		//si llego algun auto a la planta
+		cant_autos = ( matriz_ciudad[i][j] != PLANTA_NUCLEAR )? cant_autos+1 : cant_autos;
+		
+		//si ya pasaron 10 segundos o menos
+		//y llegaron 7 autos o mas se reinicia
+		if( time == 10 && cant_autos >= min ){
+			printf("planta sirve\n;");
+			time = 0;
+			cant_autos = 0;
+		}
+		//sino explota
+		else if(time > 10 && cant_autos < min){
+			printf("planta explota\n");
+			bandera = 0;
+			matriz_ciudad[i][j] = PLANTA_DESTRUIDA;
+		}
+		time++;
+		printf("planta\n");;
+		mythread_yield();
+	}
+	matriz_ciudad[i][j] = PLANTA_DESTRUIDA;
+	//explota la planta
+	mythread_yield();
 	return NULL;
 }

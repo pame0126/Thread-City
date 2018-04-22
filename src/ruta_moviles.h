@@ -20,6 +20,9 @@ int matriz_ciudad[SIZE_X][SIZE_Y];
 #define BARCO 44
 #define ROJO 55
 #define VERDE 0
+#define AMBULANCIA 99
+#define PLANTA_NUCLEAR 666
+#define PLANTA_DESTRUIDA 777
 
 
 void*pausa(void*arg);
@@ -36,5 +39,5 @@ void*puente_un_carril(void*arg);
 
 void*barco(void*arg);
 
-
+void*planta_nuclear(void*arg);
 #endif
