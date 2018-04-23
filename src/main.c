@@ -27,17 +27,12 @@ int main(int argc, char *argv[])
 	while(dimension){
 		scanf("%d %d",&a, &b );
 		matriz_nodos[a][b] = 1;
-		printf("%d %d\n",a,b);
+		//printf("%d %d\n",a,b);
 		dimension--;
 	}
-	int**res;
-	for(int i = 0;i < 20;i++){
-		res = genera_ruta();
-		printf("%d\n",res[0][0]);
-	}
+	//se cargan las rutas de los autos
+	cargar_rutas();
 	
-	
-	/*srand (time(NULL));
 	
 	mythread_t threads[NTHREADS];
 	
@@ -63,7 +58,7 @@ int main(int argc, char *argv[])
 		mythread_join(threads[i], (void **)&status);
 	}
 	
-	mythread_end(NULL);*/
+	mythread_end(NULL);
 	
 	return 0;
 }

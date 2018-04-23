@@ -4,10 +4,11 @@
 #define INF 9999
 
 #define V 110
-
-
+#define R 210
 
 int matriz_nodos[V][V];
+
+int **rutas_carros[R];
 
 int Minimo(int x, int y);
 
@@ -27,6 +28,8 @@ int* dijkstra(int graph[V][V], int ini, int dest);
 //inicializa la matriz de adyacencia
 void ini_matriz_nodos();
 
-int**genera_ruta();
+int**genera_ruta(int,int);
+
+void cargar_rutas();
 
 #endif

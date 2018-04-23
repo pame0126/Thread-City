@@ -4,8 +4,8 @@
 #include <string.h>
 #include <recorrido.h>
 
-int destinos[15] ={15,15,15,17,18,31,33,15,15,38,91,93,95,97,98};
-int origen[15] ={11,13,11,17,18,31,33,35,37,38,91,93,95,97,98};
+int origenes[15] =   {11,13,11,17,18,31,33,35,37,38,91,93,95,97,98};
+int destinos[15] = {11,13,15,17,18,31,33,35,37,38,91,93,95,97,98};
 /**
  * Valor minimo
  */
@@ -16,13 +16,6 @@ int Minimo(int x, int y) {
 	return y;
 }
 
-//retorna fila del elemento
-int returnFila(int valor){
-	int re = valor%10;
-	//printf("f %d  %d\n",re, valor);
-	return re;
-}
-
 //retorna filas del arreglo
 int* returnFilas(int* arreglo){
 	 int tan = arreglo[0]+1;
@@ -30,17 +23,11 @@ int* returnFilas(int* arreglo){
 	//memset( arreglox, 0, tan*sizeof(int) );
 	arreglox[0]=tan;
 	for(int i=1;i<=tan;i++){
-		arreglox[i]=arreglo[i] % 10;
+		arreglox[i]=arreglo[i] / 10;
 	}
 	return arreglox;
 }
 
-//retorna columna del valor
-int returnColumna(int valor){
-	int re= valor/10;
-	//printf("c %d  %d\n",re, valor);
-	return re;
-}
 
 //retorna columnas del arreglo
 int* returnColumnas(int* arreglo){
@@ -51,7 +38,7 @@ int* returnColumnas(int* arreglo){
 	//(int*)calloc(tan, sizeof(int));
 	arregloy[0]=tan;
 	for(int i=1;i<=tan;i++){
-		arregloy[i]= arreglo[i] /10;
+		arregloy[i]= arreglo[i] %10;
 	}
 	return arregloy;
 }	
@@ -66,7 +53,6 @@ int EstaMarcado(int v, int VerticesMarcados[], int markedVerticesIdx) {
 			return 1;
 		}
 	}
-
 	return 0;
 }
 
@@ -161,19 +147,19 @@ int* dijkstra(int graph[V][V], int ini, int dest) {
 
 	//imprime camino
 	int* solucion=(int*)calloc(CaminoCortoVerticeIdx+1, sizeof(int));
-	printf("Camino mas corta %d and %d\n", ini, dest);
+	//printf("Camino mas corta %d and %d\n", ini, dest);
 	solucion[0]=CaminoCortoVerticeIdx;
 	int j=1;
 	for (i = CaminoCortoVerticeIdx-1; i >= 0; i--) {
-		printf("%d",verticesCaminoCorto[i]);
+		//printf("%d",verticesCaminoCorto[i]);
 		solucion[j]=verticesCaminoCorto[i];
 		if (i > 0) {
-			printf(" --> ");
+			//printf(" --> ");
 		}
 		j++;
 	}
-	printf("\n");
-	printf("Peso del camino: %d\n", TablaPesos[wtTablaR-1][dest]);
+	//printf("\n");
+	//printf("Peso del camino: %d\n", TablaPesos[wtTablaR-1][dest]);
 	
 	//free(TablaPesos);
 	return solucion;
@@ -195,37 +181,38 @@ void ini_matriz_nodos(){
 	}
 }
 
-int **genera_ruta(){
+int **genera_ruta(int origen, int destino){
 	//inicio y destino
-	int src = rand()%15;
-	int dest = rand()%15;
 	int **ruta = calloc(2, sizeof(int*));
-	int*solucion = dijkstra(matriz_nodos, origen[src], destinos[dest]);
 	
-	/*for(int i=0;i<=solucion[0];i++){
-	  printf(" %d ",solucion[i]);	
-	}*/
-	printf("\n");
-	
-	//columnas
-	int *x;
-	x=returnColumnas(solucion);
-	ruta[0] = x;
-	//free(x);
-	/*for(int i=0;i<=solucion[0];i++){
-		printf(" %d ",x[i]);	
-	}
-	printf("\n");*/
+	int*solucion = dijkstra(matriz_nodos, origen, destino);
 	
 	//filas
+	int *x;
+	x=returnFilas(solucion);
+	ruta[0] = x;
+	
+	//columnas
 	int *y;
-	y=returnFilas(solucion);
+	y=returnColumnas(solucion);
 	ruta[1] = y;
-	//free(y);
-	/*for(int i=0;i<=solucion[0];i++){
-	  printf(" %d ",y[i]);	
-	}
-	printf("\n");*/
-	//free(solucion);
+	
 	return ruta;
+}
+
+
+void cargar_rutas(){
+	int cont = 0;
+	int a, b;
+	for(int i = 0;i < 15;i++){
+		a = origenes[i];
+		for(int j = 0;j < 15;j++){
+			b = destinos[j];
+			if(a != b){//no cargar rutas repetidas
+				rutas_carros[cont] = genera_ruta(a,b);
+				printf("pos = %d, x-> %d, y-> %d\n",cont,a,b);
+				cont++;
+			}
+		}
+	}
 }
