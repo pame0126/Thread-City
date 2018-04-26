@@ -40,4 +40,6 @@ void*puente_un_carril(void*arg);
 void*barco(void*arg);
 
 void*planta_nuclear(void*arg);
+
+void*ambulancia(void*arg);
 #endif

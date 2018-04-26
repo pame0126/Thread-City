@@ -27,12 +27,10 @@ int main(int argc, char *argv[])
 	while(dimension){
 		scanf("%d %d",&a, &b );
 		matriz_nodos[a][b] = 1;
-		//printf("%d %d\n",a,b);
 		dimension--;
 	}
 	//se cargan las rutas de los autos
 	cargar_rutas();
-	
 	
 	mythread_t threads[NTHREADS];
 	
@@ -44,8 +42,11 @@ int main(int argc, char *argv[])
 	//cruza el puente, falta validar si se queda en medio del puente el carro
 	 // Usar cuando se tenga el generado de caminos
 	 //arreglar el semaforo
-	for(; x < 3;x++){
+	for(; x < 5;x++){
 		mythread_create(&threads[x], NULL, carro, NULL, 1);
+	}
+	for(; x < 3;x++){
+		mythread_create(&threads[x], NULL, ambulancia, NULL, 10);
 	}
 	mythread_create(&threads[x], NULL, planta_nuclear, NULL, 7);x++;
 	mythread_create(&threads[x], NULL, barco, NULL, 2);x++;

@@ -204,12 +204,23 @@ int **genera_ruta(int origen, int destino){
 void cargar_rutas(){
 	int cont = 0;
 	int a, b;
+	int cont_ambulancia = 0;
+	int cont_planta = 0;
 	for(int i = 0;i < 15;i++){
 		a = origenes[i];
 		for(int j = 0;j < 15;j++){
 			b = destinos[j];
 			if(a != b){//no cargar rutas repetidas
 				rutas_carros[cont] = genera_ruta(a,b);
+				if( b == 17 || b == 18 || b == 37 || b == 38 || b == 97 || b == 98 ){
+					rutas_ambulancias[cont_ambulancia] = rutas_carros[cont];
+					cont_ambulancia++;
+				}
+				if( b == 15 ){
+					rutas_planta_nuclear[cont_planta] = rutas_carros[cont];
+					cont_planta++;
+				}
+				
 				printf("pos = %d, x-> %d, y-> %d\n",cont,a,b);
 				cont++;
 			}

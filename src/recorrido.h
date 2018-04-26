@@ -5,10 +5,20 @@
 
 #define V 110
 #define R 210
+#define ARRAY_AMBULANCIA 84
+#define ARRAY_PLANTA_NUCLEAR 16
+
+////////////arreglo de rutas////////////////
 
 int matriz_nodos[V][V];
 
 int **rutas_carros[R];
+
+int **rutas_ambulancias[ARRAY_AMBULANCIA];
+
+int **rutas_planta_nuclear[ARRAY_PLANTA_NUCLEAR];
+
+//////////////////////////////////////////////////////
 
 int Minimo(int x, int y);
 
