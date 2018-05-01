@@ -1,5 +1,5 @@
 SRCS =  mymutex.c mypthread_queue.c mypthreads.c mypthread_utilities.c mypthread_wrapper.c recorrido.c ruta_moviles.c  main.c
-INC = mymutex.h  mutex_inline.h  mutex_assam.h  mypthreads.h  mypthread_queue.h recorrido.h ruta_moviles.h
+INC = mymutex.h  mutex_inline.h  mutex_assam.h  mypthreads.h  mypthread_queue.h recorrido.h ruta_moviles.h 
 OBJS = $(SRCS:.c=.o)
 TEST_SRCS = main.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)
@@ -18,7 +18,7 @@ CC = gcc
 
 .PHONY: all lib clean tags test a5
 a5:  all
-all: lib test ejecutor
+all: lib test
 
 lib: $(LIB)
 
@@ -29,7 +29,7 @@ libmythread.a: $(OBJS) $(INC)
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity threadCity city
+	rm -f $(OBJS) $(TEST_OBJS) $(LIB) *~threadCity threadCity
 
 tags:
 	find . -name "*.[cChH]" | xargs ctags
@@ -37,6 +37,3 @@ tags:
 
 test:	$(TEST_OBJS) $(INC) lib
 	$(CC) -o threadCity $(CFLAGS) $(EXTRA_CFLAGS) $(TEST_OBJS) $(LIB)
-
-ejecutor:
-	gcc prueba.c -o city

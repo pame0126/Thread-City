@@ -9,6 +9,7 @@
 #define SIZE_Y 10
 
 int matriz_ciudad[SIZE_X][SIZE_Y];
+int ciudad_edificios[SIZE_X][SIZE_Y];
 
 #define PRIORIDAD_BAJA 0
 #define PRIORIDAD_ALTA 1

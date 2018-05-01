@@ -123,7 +123,7 @@ void *print_matriz(){
 		for(int j = 0;j < SIZE_Y;j++){
 			//pintar el semaforo
 			if(matriz_ciudad[i][j] == ROJO){
-				printf("\e[31m%c\e[0m ", 'R');
+				printf("\e[31m%c\e[0m ", '#');
 			}
 			//pintar el puente bloqueado
 			else if(matriz_ciudad[i][j] == PUENTE_BLOQUEADO){
@@ -149,7 +149,7 @@ void *print_matriz(){
 			//planta nuclear
 			else if(matriz_ciudad[i][j]==PLANTA_NUCLEAR){
 				
-				printf("\e[92m%c\e[0m ", '^');
+				printf("\e[92m%c\e[0m ", 'P');
 			}
 			//planta nuclear explotada
 			else if(matriz_ciudad[i][j]==PLANTA_DESTRUIDA){
@@ -159,7 +159,7 @@ void *print_matriz(){
 			
 			//ambulancia
 			else if(matriz_ciudad[i][j] == AMBULANCIA){
-				printf("\e[32m%c\e[0m ", 'A');
+				printf("\e[1m%c\e[0m ", 'A');
 			}
 			//carros
 			else if(matriz_ciudad[i][j] != 0){
@@ -191,13 +191,13 @@ int**escoger_ruta_carro(){
 	int ruta = rand()%100;//
 	//rutas para la planta, probabilidad del 30 porciento
 	if(ruta <= 30){
-		printf("error\n");
+		printf("ruta planta nuclear\n");
 		ruta = rand()%ARRAY_PLANTA_NUCLEAR;
 		res = rutas_planta_nuclear[ruta];
 	}
 	//sino, ruta normal
 	else{
-		printf("error 2\n");
+		printf("ruta simple 2\n");
 		ruta = rand()%R;
 		res = rutas_carros[ruta];
 	}
@@ -612,7 +612,7 @@ void *ambulancia(void*arg){
 	int xi, xj;  //posicion actual
 	int len;
 	
-	pid_t id = AMBULANCIA;//__mythread_gettid();
+	int id = AMBULANCIA;//__mythread_gettid();
 	
 	int tiempo = 4;
 	while(1){
