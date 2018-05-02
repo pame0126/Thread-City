@@ -7,13 +7,13 @@ static __inline__ int __mutex_down(int *counter)
 	if (val < 0){
 		return val;
 	}
-	
+
 	oval = compare_and_swap(counter, val-1, val);
-  
-	if (oval == val){ 
+
+	if (oval == val){
 		return val-1;
 	}
-	
+
 	return -1;
 }
 
@@ -31,7 +31,7 @@ static __inline__ int my_mutex_unlock(int *counter)
 	int val = *counter;
 
 	int oval = compare_and_swap(counter, val+1, val);
-  
+
 	return oval;
 }
 
@@ -43,7 +43,6 @@ static __inline__ int my_mutex_trylock(int *counter)
 
 	return (oval == val) && (val+1 < 0);
 }
-
 /* se bloquea y envia los escrito (datos) antes de activar
  * el semaforo
  */
