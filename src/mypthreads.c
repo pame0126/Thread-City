@@ -423,11 +423,9 @@ int mythread_yield()
 			valorRetorno = mythread_detach_RoundRobin(hilo);
 			break;
 		case 1:
-			break;
-		case 2:
 			valorRetorno = mythread_detach_Lottery(hilo);
 			break;
-		case 3:
+		case 2:
 			valorRetorno = mythread_detach_RT(hilo);
 			break;
 		default:
@@ -458,20 +456,16 @@ int mythread_chsched(int sched)
 	scheduler = sched;
 	switch (sched){
 		case 0:
-			printf("Changed Scheduler to FIFO\n");
+			printf("Agendador cambiado a Round Robin\n");
 			break;
 		case 1:
-			scheduler = 0;//se pone esta linea porque aun no hay algoritmo designado
-			printf("Changed Scheduler to Round Robin\n");
+			printf("Agendador cambiado a Lottery\n");
 			break;
 		case 2:
-			printf("Changed Scheduler to Lottery\n");
-			break;
-		case 3:
-			printf("Changed Scheduler to Real Time\n");
+			printf("Agendador cambiado a Real Time\n");
 			break;
 		default:
-			printf("Incorrect option, possible options 0 - 3 \n");
+			printf("Opcion incorrecta\ningrese un valor perteneciente a [0,2] \n");
 			exit(0);
 			return 1;
 
