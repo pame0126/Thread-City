@@ -55,7 +55,6 @@ static int __mythread_add_tcb_principal()
 	//DEBUG_PRINTF("add_tcb_principal: Creating nodo for Main thread \n");
 	tcb_principal = (mythread_private_t *) malloc(sizeof(mythread_private_t));
 	if (tcb_principal == NULL) {
-		ERROR_PRINTF("add_tcb_principal: Error allocating memory for main nodo\n");
 		return -ENOMEM;
 	}
 
@@ -116,7 +115,6 @@ int mythread_create(mythread_t * new_thread_ID,
 	 */
 	nuevo_nodo = (mythread_private_t *) malloc(sizeof(mythread_private_t));
 	if (nuevo_nodo == NULL) {
-		ERROR_PRINTF("Cannot allocate memory for nodo\n");
 		return -ENOMEM;
 	}
 
@@ -129,7 +127,6 @@ int mythread_create(mythread_t * new_thread_ID,
 	//tomado de: http://foro.elhacker.net/programacion_cc-b49.0/
 	/* posix_memalign aligns the allocated memory at a 64-bit boundry. */
 	if (posix_memalign((void **)&nueva_pila, 8, largoPila)) {
-		ERROR_PRINTF("posix_memalign failed! \n");
 		return -ENOMEM;
 	}
 
@@ -208,7 +205,6 @@ void mythread_end(void *valorRetorn)
 		case 3:
 			break;
 		default:
-			ERROR_PRINTF("Problems with the scheduler \n");
 			exit(0);
 	}
 
@@ -463,7 +459,6 @@ int mythread_yield()
 			valorRetorno = mythread_detach_RT(hilo);
 			break;
 		default:
-			ERROR_PRINTF("Problems with the scheduler \n");
 			exit(0);
 	}
 
@@ -495,20 +490,20 @@ int mythread_chsched(int sched)
 	scheduler = sched;
 	switch (sched){
 		case 0:
-			LOG_PRINTF("Changed Scheduler to FIFO\n");
+			printf("Changed Scheduler to FIFO\n");
 			break;
 		case 1:
 			scheduler = 0;//se pone esta linea porque aun no hay algoritmo designado
-			LOG_PRINTF("Changed Scheduler to Round Robin\n");
+			printf("Changed Scheduler to Round Robin\n");
 			break;
 		case 2:
-			LOG_PRINTF("Changed Scheduler to Lottery\n");
+			printf("Changed Scheduler to Lottery\n");
 			break;
 		case 3:
-			LOG_PRINTF("Changed Scheduler to Real Time\n");
+			printf("Changed Scheduler to Real Time\n");
 			break;
 		default:
-			ERROR_PRINTF("Incorrect option, possible options 0 - 3 \n");
+			printf("Incorrect option, possible options 0 - 3 \n");
 			exit(0);
 			return 1;
 

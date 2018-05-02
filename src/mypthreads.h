@@ -103,32 +103,4 @@ int mythread_detach_RT(mythread_private_t *);
 
 void __mythread_debug_futex_init();
 
-/*
- * Solo se usa con el debuguer
- */
-extern char debug_msg[1000];
-extern struct mutex debug_futex;
-
-#ifdef DEBUG
-#define DEBUG_PRINTF(...) __mythread_debug_futex_init(); \
-			mutex_down(&debug_futex); \
-			sprintf(debug_msg, __VA_ARGS__); \
-			write(1, debug_msg, strlen(debug_msg)); \
-			mutex_up(&debug_futex);
-#else
-#define DEBUG_PRINTF(...) do {} while(0);
-#endif
-
-#define ERROR_PRINTF(...) __mythread_debug_futex_init(); \
-			mutex_down(&debug_futex); \
-			sprintf(debug_msg, __VA_ARGS__); \
-			write(1, debug_msg, strlen(debug_msg)); \
-			mutex_up(&debug_futex);
-
-#define LOG_PRINTF(...) __mythread_debug_futex_init(); \
-			mutex_down(&debug_futex); \
-			sprintf(debug_msg, __VA_ARGS__); \
-			write(1, debug_msg, strlen(debug_msg)); \
-			mutex_up(&debug_futex);
-
 #endif /* mythread_H */
