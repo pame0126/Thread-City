@@ -10,7 +10,7 @@
 int CANT_RUTAS_QUEMADAS = 0;
 
 int ID_PROGRES = 1;
-
+int murio_planta_nuclear = 0;
 
 /* Se llama para que haga una pausa de 1 segundo
  */
@@ -35,11 +35,9 @@ int **ruta_q_A(){
 	int x = 3, y = 2;
 	rutaX[1] = x; rutaY[1] = y;
 	int i = 2;
-	printf("%d %d\n", rutaX[1], rutaY[1]);
 	for(; i < 8;i++){
 		x++;
 		rutaX[i] = x; rutaY[i] = y;
-		printf("%d %d\n", rutaX[i], rutaY[i]);
 	}
 	int **res = (int**)calloc(2, sizeof(int*));
 	res[0] = rutaX; res[1] = rutaY;
@@ -56,11 +54,10 @@ int **ruta_q_B(){
 	int x = 3, y = 6;
 	rutaX[1] = x; rutaY[1] = y;
 	int i = 2;
-	printf("%d %d\n", rutaX[1], rutaY[1]);
+	
 	for(; i < 8;i++){
 		x++;
 		rutaX[i] = x; rutaY[i] = y;
-		printf("%d %d\n", rutaX[i], rutaY[i]);
 	}
 	int **res = (int**)calloc(2, sizeof(int*));
 	res[0] = rutaX; res[1] = rutaY;
@@ -77,11 +74,10 @@ int **ruta_q_C(){
 	int x = 9, y = 7;
 	rutaX[1] = x; rutaY[1] = y;
 	int i = 2;
-	printf("%d %d\n", rutaX[1], rutaY[1]);
+	
 	for(; i < 8;i++){
 		x--;
 		rutaX[i] = x; rutaY[i] = y;
-		printf("%d %d\n", rutaX[i], rutaY[i]);
 	}
 	int **res = (int**)calloc(2, sizeof(int*));
 	res[0] = rutaX; res[1] = rutaY;
@@ -116,69 +112,75 @@ int **rutas_quemadas(){
 /* imprime la martiz de la cuidad
  * */
 void *print_matriz(){
-	//para el rio "Default \e[44mBlue"
-	printf("    0 1 2 3 4 5 6 7 8 9\n");
+	//imprimir la ciudad	
 	for(int i = 0; i < SIZE_X;i++){
-		printf("%2.d [ ",i);
+		printf("\t");
 		for(int j = 0;j < SIZE_Y;j++){
 			//pintar el semaforo
 			if(matriz_ciudad[i][j] == ROJO){
-				printf("\e[31m%c\e[0m ", '#');
+				printf("\e[31m%s\e[0m  ", "🚦");
 			}
 			//pintar el puente bloqueado
 			else if(matriz_ciudad[i][j] == PUENTE_BLOQUEADO){
-				printf("\e[94m%c\e[0m ", '~');
+				printf("\e[94m%s\e[0m ", "⛆");
 			}
 			//pintar el puente
 			else if(matriz_ciudad[i][j] == PUENTE){
-				printf("\e[37m%s\e[0m ", "░");
+				printf("   ");
 			}
 			else if(matriz_ciudad[i][j] == PUENTE_ESPERA){
-				printf("\e[37m%s\e[0m ", "░");
+				printf("   ");
 			}
 			//pintar el barco
 			else if(matriz_ciudad[i][j] == BARCO){
-				printf("\e[33m%c\e[0m ", 'B');
+				printf("\e[33m%s\e[0m", "⛴");
 			}
 			//pintar el rio
 			else if(( (i==5 || i==6 || i==7)&&
 					(j==1 || j ==3 || j==4 || j==5 || j == 8) )
 					&& matriz_ciudad[i][j] != BARCO){
-				printf("\e[94m%c\e[0m ", '~');
+				printf("\e[94m%s\e[0m", "⛆");
 			}
 			//planta nuclear
 			else if(matriz_ciudad[i][j]==PLANTA_NUCLEAR){
 				
-				printf("\e[92m%c\e[0m ", 'P');
+				printf("\e[92m%s\e[0m ", "☢️");
 			}
 			//planta nuclear explotada
 			else if(matriz_ciudad[i][j]==PLANTA_DESTRUIDA){
 				
-				printf("\e[91m%c\e[0m ", 'X');
+				printf("\e[91m%s\e[0m ", "💥");
 			}
 			
 			//ambulancia
 			else if(matriz_ciudad[i][j] == AMBULANCIA){
-				printf("\e[1m%c\e[0m ", 'A');
+				printf("\e[1m%s\e[0m", "🚑");
 			}
 			//carros
 			else if(matriz_ciudad[i][j] != 0){
-				printf("\e[32m%c\e[0m ", 'C');
+				printf("\e[32m%s\e[0m", "🚕");
+			}
+			//edificios
+			else if( (i == 1 && j == 1)||(i == 1 && j == 3)||
+				     (i == 3 && j == 1)||(i == 3 && j == 3)|| (i == 3 && j == 5) ||
+				     (i == 9 && j == 1)||(i == 9 && j == 3)|| (i == 9 && j == 5) ){
+				printf("\e[1m%s\e[0m ", "🏠");
+			}
+			//hospital
+			else if ( (i == 1 && j == 7)||(i == 1 && j == 8)||
+				     (i == 3 && j == 7)||(i == 3 && j == 8)||
+				     (i == 9 && j == 7)||(i == 9 && j == 8)){
+				 printf("\e[1m%s\e[0m ", "🏥");
 			}
 			else{
-				printf("%d ", matriz_ciudad[i][j]/100);
+				//la calle
+				printf("   ");
 			}
 		}
-		printf("]\n");
+		printf("\n");
 	}
-	printf("----------------------------\n");
+	printf("\t----------------------------\n");
 	return NULL;
-}
-
-void free_tupla_ruta(int **tupla){
-	free(tupla[0]);
-	free(tupla[1]);
-	free(tupla);
 }
 
 void borrar_poss_anterior(int i ,int j){
@@ -188,19 +190,18 @@ void borrar_poss_anterior(int i ,int j){
 /* escoge ruta del carro*/
 int**escoger_ruta_carro(){
 	int**res;
-	int ruta = rand()%100;//
+	int ruta = rand()%100;
 	//rutas para la planta, probabilidad del 30 porciento
-	if(ruta <= 30){
-		printf("ruta planta nuclear\n");
+	if(ruta <= 30 && !murio_planta_nuclear){
 		ruta = rand()%ARRAY_PLANTA_NUCLEAR;
 		res = rutas_planta_nuclear[ruta];
 	}
 	//sino, ruta normal
 	else{
-		printf("ruta simple 2\n");
-		ruta = rand()%R;
+		ruta = rand()%(R-1);
 		res = rutas_carros[ruta];
 	}
+	
 	return res;
 }
 
@@ -216,25 +217,16 @@ void*carro(void*arg){
 	int xi, xj;  //posicion actual
 	int len;
 	
-	int x0, y0;  //diagonales 1
-	int x1, y1;  //diagonales 2
 	pid_t id = __mythread_gettid();
 	
 	int tiempo = 4;
 	while(1){
 		if(tiempo == 4){
 			tupla = escoger_ruta_carro();
-			for(int s = 1;s < tupla[0][0];s++){
-				printf("%d %d\n", tupla[0][s], tupla[1][s]);
-			}
-			printf("------------------\n");
-			
 			i = 0, j = 0;    //posicion a la que se movera
 			xi = 0, xj = 0;  //posicion actual
 			len = tupla[0][0];
 			
-			x0 = 0, y0 = 0;  //diagonales 1
-			x1 = 0, y1 = 0;  //diagonales 2
 			//recorrer los arreglos de ruta
 			for(int a = 1; a < len ;a++){		
 				i = tupla[0][a];
@@ -244,99 +236,41 @@ void*carro(void*arg){
 					xi = tupla[0][a-1];
 					xj = tupla[1][a-1];
 					mythread_yield();
-					//mira a que lado va izq o der
-					if(j > tupla[1][a-1]){//Direccion DERECHA
-						//diagonal superior a posicion actual
-						x0 = ( xi - 1 < 0 )? 0  : xi-1;
-						y0 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj+1;
-						//diagonal inferior a posicion actual
-						x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi+1;
-						y1 = ( xj + 1 < 0)? 0 : xj+1;
+					///////////////////////////////////////////////////
+					if(	matriz_ciudad[i][j] == 0 ){
+						matriz_ciudad[i][j] = id;
+						borrar_poss_anterior(xi,xj);//borrar el anterior
 					}
-					//DIR IZQUIERDA
-					else if(j < tupla[1][a-1]){
-						//diagonal superior a posicion actual
-						x0 = ( xi - 1 < 0 )? 0 : xi-1;
-						y0 = ( xj - 1 < 0)? 0 : xj-1;
-						//diagonal inferior a posicion actual
-						x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi + 1;
-						y1 = ( xj - 1 < 0)? 0   : xj - 1;
+					//si esta en el puente de dos carriles
+					else if( ( ( i == 5 || i == 6 || i == 7 ) && ( j == 6 || j==7 ) ) &&
+						matriz_ciudad[i][j] == 0 ){
+						matriz_ciudad[i][j] = id;
+						borrar_poss_anterior(xi,xj);//borrar el anterior
 					}
-					//DIR ARRIBA
-					else if(i < tupla[0][a-1]){
-						//diagonal superior izquierda
-						x0 = ( xi - 1 < 0)? 0 : xi-1;
-						y0 = ( xj - 1 < 0)? 0 : xj-1;
-						//diagonal superior derecha
-						x1 = ( xi - 1 < 0)? 0 : xi-1;
-						y1 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj+1;
-					}
-					//DIR ABAJO
-					else if(i > tupla[0][a-1]){
-							//printf("abajo %d < %d\n",i,tupla[0][a-1]);
-						//diagonal inferior izquierda
-						x0 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi+1;
-						y0 = ( xj - 1 < 0)? 0 : xj-1;
-						//diagonal inferior derecha
-						x1 = ( xi + 1 > SIZE_X-1)? SIZE_X-1 : xi + 1;
-						y1 = ( xj + 1 > SIZE_Y-1)? SIZE_Y-1 : xj + 1;
-					}
-					
-						//Evalua el movimiento si no hay choques
-						if( matriz_ciudad[x0][y0] == 0 && 
-								matriz_ciudad[x1][y1] == 0 && 
-								matriz_ciudad[i][j] == 0 ){
-							matriz_ciudad[i][j] = id;
-							borrar_poss_anterior(xi,xj);//borrar el anterior
-						}
-						//si esta en el puente de dos carriles
-						else if( ( ( i == 5 || i == 6 || i == 7 ) && ( j == 6 || j==7 ) ) &&
-								matriz_ciudad[i][j] == 0 ){
-							matriz_ciudad[i][j] = id;
-							borrar_poss_anterior(xi,xj);//borrar el anterior
-						}
-						//si esta en el puente
-						else if(matriz_ciudad[i][j] == PUENTE || 
-								  matriz_ciudad[i][j] == PUENTE_ESPERA){
-							matriz_ciudad[xi][xj] = matriz_ciudad[i][j];
-							matriz_ciudad[i][j] = id;
-							//borrar_poss_anterior(xi,xj);//borrar el anterior
+					//si esta en el puente
+					else if(matriz_ciudad[i][j] == PUENTE || 
+						  matriz_ciudad[i][j] == PUENTE_ESPERA){
+						matriz_ciudad[xi][xj] = matriz_ciudad[i][j];
+						matriz_ciudad[i][j] = id;
+						//borrar_poss_anterior(xi,xj);//borrar el anterior
 							
-						}
-						//si esta en un semaforo
-						else if(matriz_ciudad[i][j] == ROJO &&
-								matriz_ciudad[ tupla[0][a-2] ][ tupla[1][a-2] ] == PUENTE_ESPERA){
-							//si estas en el puente bloqueado, salta el rojo
-								matriz_ciudad[i][j] = id;
-								matriz_ciudad[xi][xj] = PUENTE_ESPERA;
-						}
-						/** PRUEBA **/
-						//si esta llegado a la planta nuclear
-						else if( ( (matriz_ciudad[x0][y0] == PLANTA_NUCLEAR || matriz_ciudad[x0][y0] == PLANTA_DESTRUIDA) ||
-									(matriz_ciudad[x1][y1] == PLANTA_NUCLEAR || matriz_ciudad[x1][y1] == PLANTA_DESTRUIDA) ) && 
-									matriz_ciudad[i][j] == 0 ){
-								matriz_ciudad[i][j] = id;
-								borrar_poss_anterior(xi,xj);//borrar el anterior
-						}
-						//si llego a la planta nuclear
-						else if( matriz_ciudad[i][j] == PLANTA_NUCLEAR || 
-							matriz_ciudad[i][j] == PLANTA_DESTRUIDA ){
-								borrar_poss_anterior(xi,xj);//borrar el anterior
-						}
-						
-						
-						//te estan dando pase
-						else if( (matriz_ciudad[x0][y0] < 0 || matriz_ciudad[x1][y1] < 0) ){
-								//printf("hay choque, te estan dando pase\n");
-							matriz_ciudad[i][j] = id;
-							//borrar el anterior
-							borrar_poss_anterior(xi,xj);
-						}
-						else{//se queda en el mismo lugar con negativo
-								//printf("\t\thay choque %d\n",id);
-							matriz_ciudad[xi][xj] = id*-1;
-							a--;
-						}
+					}
+					//si esta en un semaforo
+					else if(matriz_ciudad[i][j] == ROJO &&
+						matriz_ciudad[4][2] == ROJO){
+						//si estas en el puente bloqueado, salta el rojo
+						matriz_ciudad[i][j] = id;
+						borrar_poss_anterior(xi,xj);
+					}
+					//si llego a la planta nuclear
+					else if( matriz_ciudad[i][j] == PLANTA_NUCLEAR || 
+						matriz_ciudad[i][j] == PLANTA_DESTRUIDA ){
+						borrar_poss_anterior(xi,xj);//borrar el anterior
+					}
+					else{//se queda en el mismo lugar con negativo
+						matriz_ciudad[xi][xj] = id;
+						a--;
+					}
 				}
 				//si es primer elemento
 				else{
@@ -346,7 +280,6 @@ void*carro(void*arg){
 			}
 			matriz_ciudad[i][j] = 0;
 			//Elimina los espacios de memoria
-			free_tupla_ruta(tupla);
 			tiempo = 0;
 		}
 		tiempo++;
@@ -383,7 +316,6 @@ void puente_estado_espera(int*posX, int posY){
 		if( matriz_ciudad[posX[i]][posY] == 0 || matriz_ciudad[posX[i]][posY] == PUENTE){
 			matriz_ciudad[posX[i]][posY] = PUENTE_ESPERA;
 		}
-		
 	}
 }
 
@@ -404,8 +336,6 @@ int puente_con_barco_adyacente(int*posX, int posY){
 	return 0;
 }
 
-/* 
- */
 void*puente_un_carril(void*arg){
 	mythread_yield();
 	int *posX = calloc(3, sizeof(int));
@@ -590,8 +520,8 @@ void*planta_nuclear(void*arg){
 	}
 	matriz_ciudad[i][j] = PLANTA_DESTRUIDA;
 	//explota la planta
-	quitar_ruta_planta_nuclear();
-	
+	//quitar_ruta_planta_nuclear();
+	murio_planta_nuclear = 1;
 	mythread_yield();
 	mythread_end(NULL);
 	return NULL;
@@ -618,10 +548,6 @@ void *ambulancia(void*arg){
 	while(1){
 		if(tiempo == 4){
 			tupla = escoger_ruta_ambulancia();//rutas_quemadas();
-			for(int s = 1;s < tupla[0][0];s++){
-				printf("%d %d\n", tupla[0][s], tupla[1][s]);
-			}
-			printf("------------------\n");
 			i = 0, j = 0;    //posicion a la que se movera
 			xi = 0, xj = 0;  //posicion actual
 			len = tupla[0][0];
@@ -675,7 +601,6 @@ void *ambulancia(void*arg){
 			}
 			matriz_ciudad[i][j] = 0;
 			//Elimina los espacios de memoria
-			free_tupla_ruta(tupla);
 			tiempo = 0;
 		}
 		tiempo++;
