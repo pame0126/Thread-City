@@ -141,7 +141,7 @@ int mythread_create(mythread_t * new_thread_ID,
 	mythread_q_add(nuevo_nodo);
 
 	if ((tid = clone(mythread_wrapper, (char *)nueva_pila, banderas_clonadas, nuevo_nodo)) == -1) {
-		printf("clone failed! \n");
+		printf("Fallo el clone! \n");
 		printf("ERROR: %s \n", strerror(errno));
 		return (-errno);
 	}
