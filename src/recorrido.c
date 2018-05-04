@@ -221,7 +221,7 @@ void cargar_rutas(){
 					cont_planta++;
 				}
 				
-				printf("pos = %d, x-> %d, y-> %d\n",cont,a,b);
+				//printf("pos = %d, x-> %d, y-> %d\n",cont,a,b);
 				cont++;
 			}
 		}

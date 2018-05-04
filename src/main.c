@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
 	}
 	//se cargan las rutas de los autos
 	cargar_rutas();
-	
 	mythread_t threads[NTHREADS];
 	
 	int i;
