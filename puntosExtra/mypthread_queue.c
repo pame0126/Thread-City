@@ -38,7 +38,6 @@ void mythread_q_delete(mythread_private_t * nodo)
 
 	mythread_private_t *p;
 	if (nodo == mythread_q_cabeza && nodo->siguiente == mythread_q_cabeza) {
-		printf("The Queue is now Empty!\n");
 		mythread_q_cabeza = NULL;
 	}
 
@@ -59,7 +58,7 @@ void mythread_q_estado_display()
 
 	if (mythread_q_cabeza != NULL) {
 
-		printf("\n The Queue contents are -> \n");
+		printf("\n El contenido es -> \n");
 		mythread_private_t *p;
 		p = mythread_q_cabeza;
 		do {
@@ -78,7 +77,7 @@ mythread_private_t *mythread_q_search(unsigned long new_tid)
 	if (mythread_q_cabeza != NULL) {
 
 		p = mythread_q_cabeza;
-		do {		//traverse to the last nodo in Q
+		do {
 			if (p->tid == new_tid)
 				return p;
 			p = p->siguiente;
